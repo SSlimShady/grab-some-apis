@@ -187,17 +187,27 @@ jobs:
   python-checks:
     name: 🐍 Python Quality
     runs-on: ubuntu-latest
-    if: hashFiles('apps/api/**/*.py') != ''
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 🔍 Check for Python files
+        id: check-python
+        run: |
+          if find apps/api -name "*.py" -type f | grep -q .; then
+            echo "python_files=true" >> $GITHUB_OUTPUT
+          else
+            echo "python_files=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: 🐍 Setup Python
+        if: steps.check-python.outputs.python_files == 'true'
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
       - name: 📦 Install Poetry
+        if: steps.check-python.outputs.python_files == 'true'
         uses: snok/install-poetry@v1
         with:
           version: latest
@@ -205,16 +215,19 @@ jobs:
           virtualenvs-in-project: true
 
       - name: 💾 Cache Poetry dependencies
+        if: steps.check-python.outputs.python_files == 'true'
         uses: actions/cache@v3
         with:
           path: apps/api/.venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('apps/api/poetry.lock') }}
 
       - name: 📦 Install Python dependencies
+        if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
         run: poetry install
 
       - name: 🔍 Lint Python code
+        if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
         run: |
           poetry run black --check .
@@ -222,5 +235,6 @@ jobs:
           poetry run flake8 .
 
       - name: 🧪 Run Python tests
+        if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
         run: poetry run pytest
