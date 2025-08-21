@@ -1,0 +1,63 @@
+# Label configuration for auto-labeling
+# This file defines which labels to apply based on file paths
+
+# Frontend related changes
+frontend:
+  - "apps/web/**/*"
+  - "packages/ui/**/*"
+  - "**/*.tsx"
+  - "**/*.jsx"
+
+# Backend related changes
+backend:
+  - "apps/api/**/*"
+  - "**/*.py"
+
+# Configuration changes
+config:
+  - "*.json"
+  - "*.yaml"
+  - "*.yml"
+  - ".env*"
+  - "**/tsconfig.json"
+  - "**/package.json"
+  - "turbo.json"
+  - "eslint.config.js"
+  - ".prettierrc*"
+
+# Documentation changes
+documentation:
+  - "docs/**/*"
+  - "**/*.md"
+  - "README*"
+
+# Dependencies
+dependencies:
+  - "package.json"
+  - "pnpm-lock.yaml"
+  - "poetry.lock"
+  - "pyproject.toml"
+
+# CI/CD
+ci:
+  - ".github/**/*"
+  - "**/*ci*.yml"
+  - "**/*ci*.yaml"
+
+# Tools and scripts
+tools:
+  - "tools/**/*"
+  - "scripts/**/*"
+
+# Testing
+tests:
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/test/**/*"
+  - "**/tests/**/*"
+
+# Docker
+docker:
+  - "Dockerfile*"
+  - "docker-compose*"
+  - ".dockerignore"

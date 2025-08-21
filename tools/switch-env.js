@@ -12,7 +12,7 @@
  *   node tools/switch-env.js --db=supabase --redis=local
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 
 const ENV_FILE = '.env'
 const ENV_EXAMPLE_FILE = '.env.example'

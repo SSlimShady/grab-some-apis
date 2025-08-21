@@ -7,8 +7,8 @@
  * if all required services are accessible.
  */
 
-import { readFileSync, existsSync } from 'fs'
 import { exec } from 'child_process'
+import { existsSync, readFileSync } from 'fs'
 import { promisify } from 'util'
 
 const execAsync = promisify(exec)

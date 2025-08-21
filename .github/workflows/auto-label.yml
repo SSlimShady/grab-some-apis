@@ -1,0 +1,27 @@
+name: 🏷️ Auto Label & Assign
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  issues:
+    types: [opened, edited]
+
+jobs:
+  auto-label:
+    name: 🏷️ Auto Label
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏷️ Label based on paths
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  auto-assign:
+    name: 👤 Auto Assign
+    runs-on: ubuntu-latest
+    if: github.event.pull_request
+    steps:
+      - name: 👤 Auto assign PR to author
+        uses: toshimaru/auto-author-assign@v1.6.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

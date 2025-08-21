@@ -4,6 +4,13 @@
 is all about discovery, learning, and having fun with different APIs through interactive widgets and
 a clean dashboard.
 
+[![CI/CD Pipeline](https://github.com/SSlimShady/grab-some-apis/actions/workflows/ci.yml/badge.svg)](https://github.com/SSlimShady/grab-some-apis/actions/workflows/ci.yml)
+[![Dependency Updates](https://github.com/SSlimShady/grab-some-apis/actions/workflows/dependency-updates.yml/badge.svg)](https://github.com/SSlimShady/grab-some-apis/actions/workflows/dependency-updates.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> **Note:** This is a learning/exploration project, not a library or package. Perfect for developers
+> who want to play with APIs, learn modern web development, or contribute to open source for fun!
+
 ## Features
 
 - 🔍 **API Discovery**: Browse and search through curated free public APIs
