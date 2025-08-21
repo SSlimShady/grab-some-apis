@@ -86,9 +86,6 @@ ipython_config.py
 # pipenv
 Pipfile.lock
 
-# poetry
-poetry.lock
-
 # pdm
 .pdm.toml
 
@@ -146,8 +143,30 @@ cython_debug/
 *.sqlite
 *.sqlite3
 
-# Alembic
-alembic/versions/
+# Alembic migration versions (keep alembic/ folder but ignore auto-generated versions)
+alembic/versions/*.py
+!alembic/versions/__init__.py
 
 # Local development
 .env.local
+.env.development
+.env.test
+.env.production
+
+# FastAPI specific
+.fastapi_cache/
+uploads/
+static/uploads/
+
+# Poetry virtual environment (if created locally)
+.venv/
+venv/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/

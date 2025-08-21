@@ -209,6 +209,20 @@ temp/
 # Lock files (except pnpm-lock.yaml which we want to commit)
 package-lock.json
 yarn.lock
+# Note: poetry.lock should be committed in applications
+
+# Monorepo specific
+apps/**/dist/
+apps/**/build/
+apps/**/coverage/
+
+# Python virtual environments (if created at root)
+.venv/
+venv/
+.python-version
+
+# Personal VS Code settings (keep workspace settings)
+.vscode/settings.json
 
 # Changeset files (temporary)
 .changeset/README.md

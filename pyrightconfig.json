@@ -1,0 +1,26 @@
+{
+  "include": ["apps/api/app", "apps/api/tests"],
+  "exclude": ["**/node_modules", "**/__pycache__", "apps/web"],
+  "ignore": [],
+  "defineConstant": {},
+  "stubPath": "",
+  "reportMissingModuleSource": false,
+  "pythonVersion": "3.11",
+  "pythonPlatform": "All",
+  "executionEnvironments": [
+    {
+      "root": "apps/api",
+      "pythonVersion": "3.11",
+      "extraPaths": ["apps/api"]
+    }
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "reportImportCycles": false,
+  "reportUnusedImport": true,
+  "reportUnusedClass": "warning",
+  "reportUnusedFunction": "warning",
+  "reportUnusedVariable": "warning",
+  "reportDuplicateImport": "warning"
+}
