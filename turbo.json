@@ -1,0 +1,237 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!.env*.local"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "build/**",
+        ".output/**",
+        "**/__pycache__/**",
+        "**/*.pyc"
+      ],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "PYTHON_PATH",
+        "PYTHONPATH"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "PORT",
+        "PYTHON_PATH",
+        "PYTHONPATH",
+        "UVICORN_HOST",
+        "UVICORN_PORT"
+      ]
+    },
+    "dev:python": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "DATABASE_URL",
+        "REDIS_URL",
+        "PYTHON_PATH",
+        "PYTHONPATH",
+        "UVICORN_HOST",
+        "UVICORN_PORT"
+      ]
+    },
+    "install": {
+      "inputs": [
+        "package.json",
+        "pnpm-lock.yaml",
+        "pyproject.toml",
+        "poetry.lock",
+        "requirements.txt",
+        "requirements-dev.txt"
+      ],
+      "cache": false
+    },
+    "install:python": {
+      "inputs": [
+        "pyproject.toml",
+        "poetry.lock",
+        "requirements.txt",
+        "requirements-dev.txt"
+      ],
+      "cache": false
+    },
+    "test": {
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "app/**/*.{ts,tsx,js,jsx}",
+        "__tests__/**/*.{ts,tsx,js,jsx}",
+        "tests/**/*.{ts,tsx,js,jsx}",
+        "test/**/*.{ts,tsx,js,jsx}",
+        "*.config.{js,ts,mjs}",
+        "vitest.config.*",
+        "jest.config.*"
+      ],
+      "outputs": ["coverage/**", ".vitest/**"]
+    },
+    "test:python": {
+      "inputs": [
+        "app/**/*.py",
+        "tests/**/*.py",
+        "test/**/*.py",
+        "pyproject.toml",
+        "pytest.ini",
+        ".coveragerc"
+      ],
+      "outputs": ["htmlcov/**", ".coverage", ".pytest_cache/**", "coverage.xml"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "app/**/*.{ts,tsx,js,jsx}",
+        "__tests__/**/*.{ts,tsx,js,jsx}",
+        "tests/**/*.{ts,tsx,js,jsx}",
+        "test/**/*.{ts,tsx,js,jsx}",
+        "*.config.{js,ts,mjs}",
+        "vitest.config.*",
+        "jest.config.*"
+      ],
+      "outputs": ["coverage/**", ".vitest/**"]
+    },
+    "test:coverage:python": {
+      "inputs": [
+        "app/**/*.py",
+        "tests/**/*.py",
+        "test/**/*.py",
+        "pyproject.toml",
+        "pytest.ini",
+        ".coveragerc"
+      ],
+      "outputs": ["htmlcov/**", ".coverage", "coverage.xml"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "inputs": [
+        "tests/**/*.{ts,js}",
+        "e2e/**/*.{ts,js}",
+        "playwright.config.*"
+      ],
+      "outputs": ["test-results/**", "playwright-report/**"]
+    },
+    "test:e2e:ui": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "app/**/*.{ts,tsx,js,jsx}",
+        "*.{js,ts,mjs}",
+        "eslint.config.*",
+        ".eslintrc*",
+        "package.json"
+      ]
+    },
+    "lint:python": {
+      "inputs": [
+        "app/**/*.py",
+        "tests/**/*.py",
+        "*.py",
+        "pyproject.toml",
+        ".flake8",
+        "setup.cfg"
+      ]
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "app/**/*.{ts,tsx,js,jsx}",
+        "*.{js,ts,mjs}",
+        "eslint.config.*",
+        ".eslintrc*",
+        "package.json"
+      ],
+      "cache": false
+    },
+    "lint:fix:python": {
+      "inputs": [
+        "app/**/*.py",
+        "tests/**/*.py",
+        "*.py",
+        "pyproject.toml",
+        ".flake8",
+        "setup.cfg"
+      ],
+      "cache": false
+    },
+    "format:python": {
+      "inputs": ["app/**/*.py", "tests/**/*.py", "*.py", "pyproject.toml"],
+      "cache": false
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "app/**/*.{ts,tsx}",
+        "*.ts",
+        "tsconfig.json",
+        "tsconfig.*.json"
+      ],
+      "outputs": ["dist/**/*.d.ts"]
+    },
+    "type-check:python": {
+      "inputs": [
+        "app/**/*.py",
+        "tests/**/*.py",
+        "*.py",
+        "pyproject.toml",
+        "mypy.ini",
+        ".mypy.ini"
+      ]
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalDependencies": [
+    "**/.env.*local",
+    ".env",
+    "tsconfig.json",
+    "tailwind.config.*",
+    "next.config.*",
+    "vite.config.*",
+    "vitest.config.*",
+    "playwright.config.*",
+    "eslint.config.*",
+    ".eslintrc*",
+    ".prettierrc*",
+    "prettier.config.*",
+    "pyproject.toml",
+    "poetry.lock",
+    "requirements.txt",
+    "requirements-dev.txt",
+    "pytest.ini",
+    ".coveragerc",
+    "mypy.ini",
+    ".mypy.ini",
+    ".flake8",
+    "setup.cfg"
+  ],
+  "globalEnv": ["NODE_ENV", "CI", "VERCEL", "NETLIFY", "GITHUB_TOKEN"]
+}

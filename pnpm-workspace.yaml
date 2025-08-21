@@ -1,0 +1,63 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Catalog for centralized dependency management
+catalog:
+  # React ecosystem (Latest React 19)
+  react: ^19.0.0
+  react-dom: ^19.0.0
+  "@types/react": ^19.0.0
+  "@types/react-dom": ^19.0.0
+
+  # Next.js and related (Latest with React 19 support)
+  next: ^15.1.0
+  "@next/eslint-plugin-next": ^15.1.0
+
+  # TypeScript (Latest)
+  typescript: ^5.7.2
+  "@types/node": ^22.10.1
+
+  # Testing frameworks (Latest versions)
+  vitest: ^2.1.8
+  "@vitest/ui": ^2.1.8
+  "@vitejs/plugin-react": ^4.3.4
+  jsdom: ^25.0.1
+  "@testing-library/react": ^16.1.0
+  "@testing-library/jest-dom": ^6.6.3
+  "@testing-library/user-event": ^14.5.2
+  "@playwright/test": ^1.49.0
+
+  # Styling and UI (Latest)
+  tailwindcss: ^3.4.17
+  "@tailwindcss/typography": ^0.5.15
+  "@tailwindcss/forms": ^0.5.9
+  autoprefixer: ^10.4.20
+  postcss: ^8.5.1
+
+  # Utilities (Latest)
+  clsx: ^2.1.1
+  "class-variance-authority": ^0.7.1
+  "tailwind-merge": ^2.5.5
+  lucide-react: ^0.468.0
+  "@radix-ui/react-slot": ^1.1.1
+
+  # State management and data fetching (Latest)
+  "@tanstack/react-query": ^5.62.2
+  zustand: ^5.0.2
+
+  # Form handling (Latest)
+  "react-hook-form": ^7.54.0
+  "@hookform/resolvers": ^3.10.0
+  zod: ^3.24.1
+
+  # Date handling (Latest)
+  "date-fns": ^4.1.0
+
+  # ESLint and configs (Latest ESLint v9)
+  eslint: ^9.16.0
+  "@typescript-eslint/parser": ^8.18.1
+  "@typescript-eslint/eslint-plugin": ^8.18.1
+  "eslint-config-prettier": ^9.1.0
+  "eslint-plugin-react": ^7.37.2
+  "eslint-plugin-react-hooks": ^5.0.0

@@ -1,0 +1,7 @@
+# Node version specification for the project
+
+# This ensures all team members use the same Node.js version
+
+# Used by nvm, fnm, and other Node version managers
+
+20.18.0

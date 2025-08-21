@@ -1,0 +1,101 @@
+{
+  "compilerOptions": {
+    // Language and Module
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "allowJs": true,
+    "checkJs": false,
+
+    // Bundler mode
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+
+    // Type checking
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Emit
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "removeComments": false,
+    "importHelpers": true,
+    "downlevelIteration": true,
+
+    // Interop Constraints
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": false,
+
+    // Language Features
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useUnknownInCatchVariables": true,
+    "exactOptionalPropertyTypes": false,
+
+    // Advanced
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+
+    // JSX
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+
+    // Path mapping (for monorepo)
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@grab-some-apis/ui": ["./packages/ui/src"],
+      "@grab-some-apis/ui/*": ["./packages/ui/src/*"],
+      "@grab-some-apis/types": ["./packages/types/src"],
+      "@grab-some-apis/types/*": ["./packages/types/src/*"],
+      "@grab-some-apis/utils": ["./packages/utils/src"],
+      "@grab-some-apis/utils/*": ["./packages/utils/src/*"],
+      "@grab-some-apis/config": ["./packages/config/src"],
+      "@grab-some-apis/config/*": ["./packages/config/src/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.mjs",
+    "**/*.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    ".turbo",
+    "coverage",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "ESNext",
+      "moduleResolution": "node"
+    }
+  }
+}

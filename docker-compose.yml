@@ -1,0 +1,174 @@
+version: "3.8"
+
+# ===================================================================
+# DOCKER COMPOSE FOR GRAB-SOME-APIS
+# ===================================================================
+# This file defines local development services for your application.
+#
+# Services Overview:
+# - Redis: Caching, sessions, rate limiting (ALWAYS available)
+# - PostgreSQL: Main database (OPTIONAL - use if not using Supabase)
+# - pgAdmin: PostgreSQL web management UI (OPTIONAL)
+# - Redis Insight: Redis web management UI (OPTIONAL)
+#
+# Usage Examples:
+# - pnpm docker:up          → Start PostgreSQL + Redis
+# - pnpm docker:redis       → Start only Redis
+# - pnpm tools:up           → Start all services + management UIs
+# ===================================================================
+
+services:
+  # ===================================================================
+  # REDIS CACHE (ALWAYS AVAILABLE)
+  # ===================================================================
+  # Redis is used for:
+  # - API response caching (faster repeated requests)
+  # - Rate limiting (prevent API abuse)
+  # - Session storage (user login sessions)
+  # - Job queues (background tasks)
+  # - Temporary data storage
+  redis:
+    image: redis:7-alpine # Use Redis 7 with Alpine Linux (lightweight)
+    container_name: grab-apis-redis # Custom container name for easy identification
+    restart: unless-stopped # Restart automatically unless manually stopped
+
+    # Redis server configuration
+    command: redis-server --appendonly yes --requirepass redis_password
+    # --appendonly yes     → Enable data persistence to disk
+    # --requirepass        → Set password for security
+
+    ports:
+      - "6379:6379" # Map container port 6379 to localhost:6379
+
+    volumes:
+      - redis_data:/data # Persist Redis data between container restarts
+
+    networks:
+      - grab-apis-network # Connect to custom network for inter-service communication
+
+    # Health check to ensure Redis is responding
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"] # Simple Redis command to test connection
+      interval: 10s # Check every 10 seconds
+      timeout: 3s # Wait max 3 seconds for response
+      retries: 5 # Try 5 times before marking as unhealthy
+
+  # ===================================================================
+  # POSTGRESQL DATABASE (PROFILE: local-db)
+  # ===================================================================
+  # Only starts when you use: docker-compose --profile local-db up
+  # Use this if you want local PostgreSQL instead of Supabase
+  postgres:
+    image: postgres:16-alpine # PostgreSQL 16 with Alpine Linux (lightweight)
+    container_name: grab-apis-postgres # Custom container name
+    restart: unless-stopped # Auto-restart policy
+
+    # Database configuration via environment variables
+    environment:
+      POSTGRES_DB: grab_apis_dev # Database name (auto-created)
+      POSTGRES_USER: postgres # Database username
+      POSTGRES_PASSWORD: postgres # Database password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8" # Character encoding settings
+
+    ports:
+      - "5432:5432" # Map container port 5432 to localhost:5432
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist database data
+      - ./tools/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro # Run initialization script
+
+    networks:
+      - grab-apis-network
+
+    # Health check to ensure PostgreSQL is ready to accept connections
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d grab_apis_dev"] # PostgreSQL ready check
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    profiles:
+      - local-db # Only starts with --profile local-db
+
+  # ===================================================================
+  # DEVELOPMENT TOOLS (OPTIONAL)
+  # ===================================================================
+
+  # Redis Management UI - Web interface for Redis
+  redis-insight:
+    image: redislabs/redisinsight:latest # Official Redis management tool
+    container_name: grab-apis-redis-insight
+    restart: unless-stopped
+
+    ports:
+      - "8001:8001" # Access at http://localhost:8001
+
+    volumes:
+      - redis_insight_data:/db # Persist Redis Insight settings
+
+    networks:
+      - grab-apis-network
+
+    depends_on:
+      redis:
+        condition: service_healthy # Wait for Redis to be healthy before starting
+
+    profiles:
+      - tools # Only starts with --profile tools
+
+  # PostgreSQL Management UI - Web interface for PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest # Official PostgreSQL administration tool
+    container_name: grab-apis-pgadmin
+    restart: unless-stopped
+
+    # pgAdmin configuration
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@grab-apis.local # Login email for pgAdmin
+      PGADMIN_DEFAULT_PASSWORD: admin # Login password for pgAdmin
+      PGADMIN_CONFIG_SERVER_MODE: "False" # Disable server mode (single user)
+
+    ports:
+      - "5050:80" # Access at http://localhost:5050
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin # Persist pgAdmin settings and connections
+
+    networks:
+      - grab-apis-network
+
+    depends_on:
+      postgres:
+        condition: service_healthy # Wait for PostgreSQL to be ready
+
+    profiles:
+      - local-db # Needs local PostgreSQL
+      - tools # Also part of tools profile
+
+# ===================================================================
+# PERSISTENT VOLUMES
+# ===================================================================
+# These volumes store data that persists between container restarts
+volumes:
+  postgres_data:
+    driver: local # Store on local filesystem
+    # Location: Usually in /var/lib/docker/volumes/ on Linux
+    #          or C:\ProgramData\docker\volumes\ on Windows
+
+  redis_data:
+    driver: local # Redis data persistence
+
+  pgadmin_data:
+    driver: local # pgAdmin settings and connections
+
+  redis_insight_data:
+    driver: local # Redis Insight settings
+
+# ===================================================================
+# CUSTOM NETWORK
+# ===================================================================
+# Creates isolated network for container communication
+networks:
+  grab-apis-network:
+    driver: bridge # Bridge network type (default for Docker Compose)
+    name: grab-apis-network # Custom network name
