@@ -30,7 +30,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9.12.3
+          version: 10.15.0
           run_install: false
 
       - name: 🗂️ Get pnpm store directory
@@ -67,7 +67,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9.12.3
+          version: 10.15.0
 
       - name: 🗂️ Get pnpm store directory
         shell: bash
@@ -108,7 +108,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9.12.3
+          version: 10.15.0
 
       - name: 🗂️ Get pnpm store directory
         shell: bash
@@ -143,7 +143,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9.12.3
+          version: 10.15.0
 
       - name: 🗂️ Get pnpm store directory
         shell: bash
@@ -178,7 +178,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9.12.3
+          version: 10.15.0
 
       - name: 🔒 Run security audit
         run: pnpm audit --audit-level moderate
