@@ -6,10 +6,12 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from app.api.routes import router as api_router
 from app.core.config import settings
@@ -71,7 +73,48 @@ def create_application() -> FastAPI:
     )
 
     # Include API routes
-    app.include_router(api_router, prefix=settings.API_V1_STR)
+    app.include_router(api_router, prefix=settings.API_STR)
+
+    # Add exception handlers for better error responses
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ):
+        """Handle FastAPI request validation errors (422 -> 400)."""
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "Validation failed",
+                "details": [
+                    {
+                        "field": " -> ".join(str(loc) for loc in error["loc"]),
+                        "message": error["msg"],
+                        "type": error["type"],
+                    }
+                    for error in exc.errors()
+                ],
+            },
+        )
+
+    @app.exception_handler(ValidationError)
+    async def pydantic_validation_exception_handler(
+        request: Request, exc: ValidationError
+    ):
+        """Handle Pydantic validation errors."""
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "Validation failed",
+                "details": [
+                    {
+                        "field": " -> ".join(str(loc) for loc in error["loc"]),
+                        "message": error["msg"],
+                        "type": error["type"],
+                    }
+                    for error in exc.errors()
+                ],
+            },
+        )
 
     # Root endpoint
     @app.get("/", response_class=JSONResponse)

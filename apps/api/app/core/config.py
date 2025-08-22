@@ -3,9 +3,9 @@ Core configuration settings for the FastAPI application.
 """
 
 import secrets
-from typing import List, Optional, Union
+from typing import List, Optional
 
-from pydantic import AnyHttpUrl, field_validator, model_validator
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
     # API Configuration
-    API_V1_STR: str = "/api/v1"
+    API_STR: str = "/api"
     PROJECT_NAME: str = "Grab Some APIs"
     VERSION: str = "0.1.0"
     DESCRIPTION: str = (
@@ -34,22 +34,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     # CORS
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
+    BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",  # Next.js dev server
         "http://localhost:8000",  # FastAPI dev server
         "https://grab-some-apis.vercel.app",  # Production frontend
     ]
-
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    @classmethod
-    def assemble_cors_origins(
-        cls, v: Union[str, List[str]]
-    ) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
 
     # Database Configuration
     POSTGRES_SERVER: str = "localhost"
@@ -91,6 +80,12 @@ class Settings(BaseSettings):
     # External APIs Configuration
     API_RATE_LIMIT: int = 100  # requests per minute
     API_TIMEOUT: int = 30  # seconds
+
+    # NASA API Configuration
+    NASA_API_KEY: str = (
+        "DEMO_KEY"  # Default demo key, should be overridden in production
+    )
+    NASA_BASE_URL: str = "https://api.nasa.gov"
 
     # Logging
     LOG_LEVEL: str = "INFO"
