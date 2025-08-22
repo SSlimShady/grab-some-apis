@@ -29,6 +29,13 @@ export default function Home() {
         <div className='flex flex-col items-center gap-4 sm:flex-row'>
           <a
             className='bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent px-4 text-sm font-medium transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]'
+            href='/nasa'
+            rel='noopener noreferrer'
+          >
+            🚀 Explore NASA APOD
+          </a>
+          <a
+            className='bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent px-4 text-sm font-medium transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]'
             href='/api/health'
             rel='noopener noreferrer'
           >
@@ -59,6 +66,14 @@ export default function Home() {
             height={16}
           />
           View Source
+        </a>
+        <a
+          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
+          href='/nasa'
+          rel='noopener noreferrer'
+        >
+          <span className='text-lg'>🚀</span>
+          NASA APOD
         </a>
         <a
           className='flex items-center gap-2 hover:underline hover:underline-offset-4'
