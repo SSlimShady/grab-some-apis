@@ -3,16 +3,27 @@ Core configuration settings for the FastAPI application.
 """
 
 import secrets
+from pathlib import Path
 from typing import List, Optional
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Get the path to the API root directory (where .env files are located)
+API_ROOT = Path(__file__).parent.parent.parent
+
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(
+        env_file=[
+            API_ROOT / ".env.local",
+            API_ROOT / ".env",
+        ],
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     # API Configuration
     API_STR: str = "/api"
@@ -90,6 +101,26 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    def model_post_init(self, __context) -> None:
+        """Post-initialization method to show loaded configuration."""
+        if self.DEBUG:
+            print("🔧 Configuration Debug Info:")
+            print(f"   API_ROOT path: {API_ROOT}")
+            print(
+                f"   .env.local exists: {(API_ROOT / '.env.local').exists()}"
+            )
+            print(f"   .env exists: {(API_ROOT / '.env').exists()}")
+            print(f"   DEBUG: {self.DEBUG} (type: {type(self.DEBUG)})")
+            print(f"   HOST: {self.HOST}")
+            print(f"   PORT: {self.PORT}")
+            print(f"   RELOAD: {self.RELOAD}")
+            nasa_key_display = (
+                "***" + self.NASA_API_KEY[-4:]
+                if len(self.NASA_API_KEY) > 4
+                else "***"
+            )
+            print(f"   NASA_API_KEY: {nasa_key_display}")
 
 
 # Create global settings instance
