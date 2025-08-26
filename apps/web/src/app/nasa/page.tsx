@@ -2,32 +2,25 @@
 
 /**
  * NASA Astronomy Picture of the Day (APOD) Page
- *
- * Features:
- * - TanStack Query for data fetching and caching
- * - Zustand for global state management
- * - Automatic prefetching for better UX
- * - Persistent favorites and preferences
- * - Responsive design with error handling
  */
 
-import { useEffect } from 'react'
-import Link from 'next/link'
-import { APODResponse } from '@/types/nasa'
-import { useNASAStore } from '@/stores/nasa-store'
-import {
-  useAPODByDate,
-  useAPODToday,
-  useAPODRandom,
-  usePrefetchAdjacentDates,
-} from '@/hooks/use-nasa-queries'
 import {
   APODCard,
+  DatePicker,
   ErrorMessage,
   LoadingSpinner,
   PageHeader,
-  DatePicker,
 } from '@/components/ui/nasa-components'
+import {
+  useAPODByDate,
+  useAPODRandom,
+  useAPODToday,
+  usePrefetchAdjacentDates,
+} from '@/hooks/use-nasa-queries'
+import { useNASAStore } from '@/stores/nasa-store'
+import { APODResponse } from '@/types/nasa'
+import Link from 'next/link'
+import { useEffect } from 'react'
 
 export default function NASAPage() {
   const {
@@ -346,12 +339,6 @@ export default function NASAPage() {
               June 16, 1995, APOD has featured a different astronomical image or
               video each day, accompanied by a detailed explanation written by
               professional astronomers.
-            </p>
-            <p className='mt-4 text-gray-700 dark:text-gray-300'>
-              This page uses NASA&apos;s official APOD API with modern React
-              patterns including TanStack Query for caching and Zustand for
-              state management. Your preferences and favorites are automatically
-              saved locally.
             </p>
           </div>
           <div className='mt-6 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400'>
