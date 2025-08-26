@@ -2,16 +2,14 @@
 NASA API routes for astronomical data and imagery.
 """
 
-from typing import List, Union
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.schemas.nasa import APODRequest, APODResponse
 from app.services.nasa_service import (
     NASAAPIError,
-    NASAConnectionError,
     NASAService,
-    NASATimeoutError,
     NASAValidationError,
     get_nasa_service,
 )
@@ -21,7 +19,7 @@ router = APIRouter()
 
 @router.get(
     "/apod",
-    response_model=Union[APODResponse, List[APODResponse]],
+    response_model=APODResponse | List[APODResponse],
     status_code=status.HTTP_200_OK,
     summary="Get Astronomy Picture of the Day",
     description="""
@@ -37,7 +35,7 @@ router = APIRouter()
 async def get_astronomy_picture_of_day(
     request: APODRequest = Depends(),  # Auto-parses query params
     nasa_service: NASAService = Depends(get_nasa_service),  # Injects service
-) -> Union[APODResponse, List[APODResponse]]:
+):
     """
     Get Astronomy Picture of the Day from NASA.
     """

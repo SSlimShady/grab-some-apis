@@ -15,6 +15,7 @@ from pydantic import ValidationError
 
 from app.api.routes import router as api_router
 from app.core.config import settings
+from app.services.base import shutdown_http_client, startup_http_client
 
 # Configure logging
 logging.basicConfig(
@@ -34,10 +35,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
     logger.info(f"API Version: {settings.VERSION}")
 
+    # Initialize shared HTTP client
+    await startup_http_client()
+    logger.info("HTTP client initialized")
+
     yield
 
     # Shutdown
     logger.info("Shutting down Grab Some APIs backend...")
+
+    # Cleanup shared HTTP client
+    await shutdown_http_client()
+    logger.info("HTTP client closed")
 
 
 def create_application() -> FastAPI:

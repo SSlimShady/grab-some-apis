@@ -14,9 +14,9 @@ class APODResponse(BaseModel):
     title: str
     date: str
     explanation: str
-    url: str  # Using string for compatibility
-    hdurl: Optional[str] = None
     media_type: str
+    url: Optional[str] = None
+    hdurl: Optional[str] = None
     service_version: str
     copyright: Optional[str] = None
 
@@ -65,13 +65,13 @@ class APODRequest(BaseModel):
 
             if parsed_date < min_date:
                 raise ValueError(
-                    f'{field_name.replace("_", " ").title()} must be on or after 1995-06-16 (first APOD). Got: {v}'
+                    f"{field_name.replace('_', ' ').title()} must be on or after 1995-06-16 (first APOD). Got: {v}"
                 )
 
             # Don't allow future dates beyond today
             if parsed_date > date.today():
                 raise ValueError(
-                    f'{field_name.replace("_", " ").title()} cannot be in the future. Got: {v}'
+                    f"{field_name.replace('_', ' ').title()} cannot be in the future. Got: {v}"
                 )
 
         return v
