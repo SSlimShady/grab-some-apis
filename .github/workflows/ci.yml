@@ -17,12 +17,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Job 1: Install dependencies and cache them
-  setup:
-    name: 📦 Setup Dependencies
+  # Job 1: Code quality and linting
+  lint:
+    name: � Lint & Format
     runs-on: ubuntu-latest
-    outputs:
-      node-cache-hit: ${{ steps.node-cache.outputs.cache-hit }}
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -36,15 +34,13 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 10.15.0
-          run_install: false
 
       - name: 🗂️ Get pnpm store directory
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: 💾 Cache pnpm dependencies
-        id: node-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -52,59 +48,59 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: 📦 Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: |
-          pnpm install --frozen-lockfile --ignore-scripts
-          pnpm rebuild
-
-  # Job 2: Code quality checks
-  quality:
-    name: 🔍 Code Quality
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.15.0
-
-      - name: 🗂️ Get pnpm store directory
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: 💾 Restore pnpm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: 📦 Install dependencies
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm rebuild
 
       - name: 🎨 Check code formatting
-        run: pnpm format:check
+        run: pnpm format:check --filter=!@grab-some-apis/api
 
       - name: 🔍 Lint code
-        run: pnpm lint
+        run: pnpm lint --filter=!@grab-some-apis/api
+
+  # Job 2: Type checking
+  typecheck:
+    name: 📝 Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.15.0
+
+      - name: 🗂️ Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 💾 Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📦 Install dependencies
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm rebuild
 
       - name: 🏗️ Type check
-        run: pnpm type-check
+        run: pnpm type-check --filter=!@grab-some-apis/api
 
   # Job 3: Build applications
   build:
-    name: 🏗️ Build Applications
+    name: 🏗️ Build
     runs-on: ubuntu-latest
-    needs: setup
+    needs: [lint, typecheck]
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -123,25 +119,36 @@ jobs:
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: 💾 Restore pnpm dependencies
-        uses: actions/cache@v3
+      - name: 💾 Cache pnpm dependencies
+        uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: 📦 Install dependencies
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm rebuild
 
-      - name: 🏗️ Build all applications
-        run: pnpm build
+      - name: 🏗️ Build applications
+        run: pnpm build --filter=!@grab-some-apis/api
 
-  # Job 4: Run tests
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            apps/web/.next/
+            apps/web/out/
+          retention-days: 1
+
+  # Job 4: Test applications
   test:
-    name: 🧪 Run Tests
+    name: 🧪 Test
     runs-on: ubuntu-latest
-    needs: setup
+    needs: [lint, typecheck]
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -160,47 +167,26 @@ jobs:
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: 💾 Restore pnpm dependencies
-        uses: actions/cache@v3
+      - name: 💾 Cache pnpm dependencies
+        uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: 📦 Install dependencies
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm rebuild
 
-      - name: 🧪 Run unit tests
-        run: pnpm test
+      - name: 🧪 Run tests
+        run: pnpm test --filter=!@grab-some-apis/api
 
-  # Job 5: Security audit
-  security:
-    name: 🔒 Security Audit
+  # Job 5: Python quality checks
+  python:
+    name: 🐍 Python
     runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.15.0
-
-      - name: 🔒 Run security audit
-        run: pnpm audit --audit-level moderate
-
-  # Job 6: Python/FastAPI checks (when API is created)
-  python-checks:
-    name: 🐍 Python Quality
-    runs-on: ubuntu-latest
-    continue-on-error: true # Don't fail CI if Python checks fail
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -208,10 +194,12 @@ jobs:
       - name: 🔍 Check for Python files
         id: check-python
         run: |
-          if find apps/api -name "*.py" -type f | grep -q .; then
+          if find apps/api -name "*.py" -type f | head -1 | grep -q .; then
             echo "python_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found Python files in apps/api"
           else
             echo "python_files=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No Python files found in apps/api"
           fi
 
       - name: 🐍 Setup Python
@@ -230,25 +218,60 @@ jobs:
 
       - name: 💾 Cache Poetry dependencies
         if: steps.check-python.outputs.python_files == 'true'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: apps/api/.venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('apps/api/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
 
       - name: 📦 Install Python dependencies
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
-        run: poetry install
+        run: poetry install --no-interaction --no-ansi
 
-      - name: 🔍 Lint Python code
+      - name: 🎨 Format check
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
-        run: |
-          poetry run black --check . || echo "Black formatting issues found"
-          poetry run isort --check-only . || echo "isort import issues found" 
-          poetry run flake8 . || echo "Flake8 linting issues found"
+        run: poetry run black --check .
 
-      - name: 🧪 Run Python tests
+      - name: 📦 Import check
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
-        run: poetry run pytest || echo "Python tests failed"
+        run: poetry run isort --check-only .
+
+      - name: 🔍 Lint
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry run flake8 .
+
+      - name: 📝 Type check
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry run mypy app
+
+      - name: 🧪 Test
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry run pytest -v
+
+  # Job 6: Security audit
+  security:
+    name: 🔒 Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.15.0
+
+      - name: 🔒 Audit dependencies
+        run: pnpm audit --audit-level moderate --filter=!@grab-some-apis/api
