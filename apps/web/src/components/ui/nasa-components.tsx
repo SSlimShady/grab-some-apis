@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Reusable UI components for NASA page
  */
@@ -6,7 +8,15 @@ import { ERRORS, IMAGES, NASA, UI } from '@/lib/constants'
 import { MediaType } from '@/lib/enums'
 import { APODResponse } from '@/types/nasa'
 import Image from 'next/image'
-import { ReactNode } from 'react'
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from 'react'
+import { toast } from 'sonner'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
@@ -89,22 +99,94 @@ interface APODCardProps {
 }
 
 export function APODCard({ apod, className = '' }: APODCardProps) {
-  const isVideo = apod.media_type === MediaType.VIDEO
-  const imageUrl = apod.url
-  const hdImageUrl = apod.hdurl || apod.url
+  const [imageLoading, setImageLoading] = useState(true)
+  const [imageError, setImageError] = useState(false)
+  const [imageSrc, setImageSrc] = useState<string>(apod.url || '')
 
-  // Check if the image is a GIF
-  const isGif = imageUrl?.toLowerCase().endsWith(NASA.FILE_EXTENSIONS.GIF)
+  // Memoize derived values to prevent unnecessary recalculations
+  const { isVideo, imageUrl, hdImageUrl, isGif } = useMemo(
+    () => ({
+      isVideo: apod.media_type === MediaType.VIDEO,
+      imageUrl: apod.url,
+      hdImageUrl: apod.hdurl || apod.url,
+      isGif:
+        apod.url?.toLowerCase().endsWith(NASA.FILE_EXTENSIONS.GIF) ?? false,
+    }),
+    [apod.url, apod.hdurl, apod.media_type]
+  )
 
-  // Provide fallback image when url is null/undefined/empty
-  const safeSrc = imageUrl && imageUrl.trim() ? imageUrl : IMAGES.FALLBACK
+  // Memoize formatted date to prevent unnecessary re-formatting
+  const formattedDate = useMemo(
+    () =>
+      new Date(apod.date).toLocaleDateString(
+        UI.DATE_FORMAT.LOCALE,
+        UI.DATE_FORMAT.OPTIONS
+      ),
+    [apod.date]
+  )
+
+  // Optimize event handlers with useCallback
+  const handleImageLoad = useCallback(() => {
+    setImageLoading(false)
+  }, [])
+
+  const handleImageError = useCallback(() => {
+    console.error(ERRORS.IMAGE_LOAD_FAILED, imageSrc)
+    setImageLoading(false)
+    // If original image fails and we're not already using fallback, switch to fallback
+    if (imageSrc !== IMAGES.FALLBACK) {
+      setImageSrc(IMAGES.FALLBACK)
+      setImageError(false) // Reset error state to try fallback
+      setImageLoading(true) // Show loading again for fallback
+    } else {
+      // If fallback also fails, show error state
+      setImageError(true)
+    }
+  }, [imageSrc])
+
+  const handleShare = useCallback(async () => {
+    try {
+      if (typeof window !== 'undefined' && window.navigator?.share) {
+        await window.navigator.share({
+          title: apod.title,
+          text: apod.explanation.slice(0, 200) + '...', // Truncate for sharing
+          url: apod.url,
+        })
+      } else {
+        // Fallback: copy link to clipboard
+        await navigator.clipboard.writeText(apod.url)
+        toast('Link copied to clipboard!')
+      }
+    } catch (error) {
+      console.error('Error sharing:', error)
+      // Fallback to clipboard
+      try {
+        await navigator.clipboard.writeText(apod.url)
+        toast('Link copied to clipboard!')
+      } catch (clipboardError) {
+        console.error('Clipboard error:', clipboardError)
+      }
+    }
+  }, [apod.title, apod.explanation, apod.url])
+
+  // Reset states when APOD changes (important for navigation)
+  useEffect(() => {
+    if (!isVideo) {
+      setImageLoading(true)
+      setImageError(false)
+      // Set initial image source - use the actual URL or fallback to placeholder
+      const initialSrc =
+        imageUrl && imageUrl.trim() ? imageUrl : IMAGES.FALLBACK
+      setImageSrc(initialSrc)
+    }
+  }, [imageUrl, isVideo, apod.date])
 
   return (
     <article
       className={`rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900 ${className}`}
     >
       {/* Image/Video Container */}
-      <div className='aspect-video w-full overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-800'>
+      <div className='relative aspect-video w-full overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-800'>
         {isVideo ? (
           <iframe
             src={apod.url}
@@ -114,26 +196,48 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
             loading='lazy'
           />
         ) : (
-          <Image
-            src={safeSrc}
-            alt={apod.title}
-            width={800}
-            height={450}
-            className='h-full w-full object-cover transition-transform hover:scale-105'
-            priority={false}
-            placeholder='blur'
-            blurDataURL={IMAGES.PLACEHOLDER_BLUR}
-            // For GIFs, disable optimization to preserve animation
-            unoptimized={isGif}
-            // Add error handling
-            onError={e => {
-              console.error(ERRORS.IMAGE_LOAD_FAILED, safeSrc)
-              // Only fallback to fallback image if not already using it
-              if (safeSrc !== IMAGES.FALLBACK) {
-                e.currentTarget.src = IMAGES.FALLBACK
-              }
-            }}
-          />
+          <>
+            {imageSrc && imageSrc.trim() && (
+              <Image
+                key={`apod-image-${apod.date}`}
+                src={imageSrc}
+                alt={apod.title}
+                width={800}
+                height={450}
+                className='h-full w-full object-cover transition-transform hover:scale-105'
+                priority={false}
+                placeholder='blur'
+                blurDataURL={IMAGES.PLACEHOLDER_BLUR}
+                // For GIFs, disable optimization to preserve animation
+                unoptimized={isGif}
+                // Add loading handlers
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            )}
+
+            {/* Error state */}
+            {imageError && !imageLoading && (
+              <div className='absolute inset-0 flex items-center justify-center bg-red-50 dark:bg-red-950'>
+                <div className='p-4 text-center'>
+                  <svg
+                    className='mx-auto mb-2 h-8 w-8 text-red-400'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z'
+                      clipRule='evenodd'
+                    />
+                  </svg>
+                  <p className='text-sm text-red-600 dark:text-red-400'>
+                    {ERRORS.IMAGE_LOAD_FAILED}
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -145,11 +249,8 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
             {apod.title}
           </h2>
           <div className='mt-2 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400'>
-            <time dateTime={apod.date}>
-              {new Date(apod.date).toLocaleDateString(
-                UI.DATE_FORMAT.LOCALE,
-                UI.DATE_FORMAT.OPTIONS
-              )}
+            <time dateTime={apod.date} aria-label={`Date: ${formattedDate}`}>
+              {formattedDate}
             </time>
             <span className='inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200'>
               <svg className='h-3 w-3' viewBox='0 0 20 20' fill='currentColor'>
@@ -197,11 +298,8 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
             </a>
           )}
           <button
-            onClick={() => {
-              if (typeof window !== 'undefined' && window.navigator?.share) {
-                window.navigator.share({ title: apod.title, url: apod.url })
-              }
-            }}
+            onClick={handleShare}
+            aria-label={`Share ${apod.title}`}
             className='inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           >
             <svg className='h-4 w-4' viewBox='0 0 20 20' fill='currentColor'>
@@ -266,17 +364,25 @@ export function DatePicker({
   min,
   className = '',
 }: DatePickerProps) {
+  // Use React's useId hook for SSR-safe unique IDs
+  const id = useId()
+
   return (
     <div className={className}>
-      <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+      <label
+        htmlFor={id}
+        className='block text-sm font-medium text-gray-700 dark:text-gray-300'
+      >
         {label}
       </label>
       <input
+        id={id}
         type='date'
         value={value}
         onChange={e => onChange(e.target.value)}
         max={max}
         min={min}
+        aria-label={label}
         className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
       />
     </div>

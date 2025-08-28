@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'apod.nasa.gov',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.youtube.com',
+      },
     ],
     // Add GIF support and other formats
     formats: ['image/webp', 'image/avif'],
