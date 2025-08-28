@@ -5,7 +5,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ViewMode = 'today' | 'date' | 'random'
+export type ViewMode = 'date' | 'random'
 
 interface NASAPreferences {
   viewMode: ViewMode
@@ -72,7 +72,7 @@ export const useNASAStore = create<NASAStore>()(
 
       // Preferences state
       preferences: {
-        viewMode: 'today',
+        viewMode: 'date',
         randomCount: 1,
         selectedDate: getTodayString(),
       },

@@ -49,6 +49,26 @@ export default [
       globals: {
         React: 'readonly',
         JSX: 'readonly',
+        // Browser globals
+        console: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        fetch: 'readonly',
+        Headers: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        AbortSignal: 'readonly',
+        // Node.js globals (for Next.js)
+        process: 'readonly',
+        Buffer: 'readonly',
+        global: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
       },
     },
     plugins: {

@@ -29,7 +29,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       })
   )
 
-  // eslint-disable-next-line no-undef
   const isDevelopment = process.env.NODE_ENV === 'development'
 
   return (

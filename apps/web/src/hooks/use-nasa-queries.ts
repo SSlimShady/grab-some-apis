@@ -2,7 +2,7 @@
  * TanStack Query hooks for NASA API data fetching
  */
 
-import { fetchAPOD } from '@/lib/nasa-api'
+import { fetchAPOD } from '@/lib/api/nasa-api'
 import { APODRequest } from '@/types/nasa'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -23,28 +23,8 @@ export function useAPODByDate(date: string) {
     queryFn: () => fetchAPOD({ date }),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes (was cacheTime)
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     refetchOnWindowFocus: false,
     enabled: !!date,
-  })
-}
-
-/**
- * Hook for fetching today's APOD
- */
-export function useAPODToday() {
-  const today = new Date().toISOString().split('T')[0]
-
-  return useQuery({
-    queryKey: nasaKeys.apod({ date: today }),
-    queryFn: () => fetchAPOD({ date: today }),
-    staleTime: 10 * 60 * 1000, // 10 minutes for today's data
-    gcTime: 60 * 60 * 1000, // 1 hour
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-    refetchOnWindowFocus: true,
-    refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes for today
   })
 }
 
@@ -59,8 +39,6 @@ export function useAPODRandom(count: number = 1) {
     queryFn: () => fetchAPOD({ count }),
     staleTime: 0, // Always fresh for random queries
     gcTime: 5 * 60 * 1000, // 5 minutes
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     refetchOnWindowFocus: false,
     enabled: false, // Manual refetch only
     select: data => {
@@ -86,8 +64,6 @@ export function useAPODRange(startDate: string, endDate: string) {
     queryFn: () => fetchAPOD({ start_date: startDate, end_date: endDate }),
     staleTime: 15 * 60 * 1000, // 15 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     refetchOnWindowFocus: false,
     enabled: !!(startDate && endDate),
   })
@@ -110,7 +86,6 @@ export function usePrefetchAPOD() {
     },
     onError: error => {
       if (typeof window !== 'undefined') {
-        // eslint-disable-next-line no-undef
         console.warn('Failed to prefetch APOD:', error)
       }
     },

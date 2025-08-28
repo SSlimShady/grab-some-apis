@@ -1,4 +1,5 @@
 import { LoadingSpinner } from '@/components/ui/nasa-components'
+import { UI } from '@/lib/constants'
 
 export default function Loading() {
   return (
@@ -27,7 +28,7 @@ export default function Loading() {
           <div className='text-center'>
             <LoadingSpinner size='lg' className='mx-auto mb-4' />
             <p className='text-gray-600 dark:text-gray-400'>
-              Loading NASA astronomy data...
+              {UI.LOADING_MESSAGES.NASA}
             </p>
           </div>
         </div>

@@ -14,9 +14,9 @@ import {
 import {
   useAPODByDate,
   useAPODRandom,
-  useAPODToday,
   usePrefetchAdjacentDates,
 } from '@/hooks/use-nasa-queries'
+import { ERRORS, UI } from '@/lib/constants'
 import { useNASAStore } from '@/stores/nasa-store'
 import { APODResponse } from '@/types/nasa'
 import Link from 'next/link'
@@ -42,7 +42,6 @@ export default function NASAPage() {
   const { viewMode, randomCount, selectedDate } = preferences
 
   // Query hooks based on view mode
-  const todayQuery = useAPODToday()
   const dateQuery = useAPODByDate(viewMode === 'date' ? selectedDate : '')
   const randomQuery = useAPODRandom(randomCount)
 
@@ -59,14 +58,12 @@ export default function NASAPage() {
   // Get current query based on view mode
   const getCurrentQuery = () => {
     switch (viewMode) {
-      case 'today':
-        return todayQuery
       case 'date':
         return dateQuery
       case 'random':
         return randomQuery
       default:
-        return todayQuery
+        return dateQuery
     }
   }
 
@@ -207,16 +204,6 @@ export default function NASAPage() {
           {/* View Mode Selector */}
           <div className='flex rounded-lg border border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800'>
             <button
-              onClick={() => setViewMode('today')}
-              className={`px-4 py-2 text-sm font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
-                viewMode === 'today'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              Today
-            </button>
-            <button
               onClick={() => setViewMode('date')}
               className={`px-4 py-2 text-sm font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
                 viewMode === 'date'
@@ -302,7 +289,7 @@ export default function NASAPage() {
               <div className='text-center'>
                 <LoadingSpinner size='lg' className='mx-auto mb-4' />
                 <p className='text-gray-600 dark:text-gray-400'>
-                  Loading astronomy data from NASA...
+                  {UI.LOADING_MESSAGES.NASA}
                 </p>
               </div>
             </div>
@@ -310,10 +297,8 @@ export default function NASAPage() {
 
           {currentQuery.isError && (
             <ErrorMessage
-              title='Failed to Load NASA Data'
-              message={
-                currentQuery.error?.message || 'An unexpected error occurred'
-              }
+              title={ERRORS.NASA_DATA_LOAD_FAILED}
+              message={currentQuery.error?.message || ERRORS.UNEXPECTED_ERROR}
               onRetry={() => currentQuery.refetch()}
             />
           )}

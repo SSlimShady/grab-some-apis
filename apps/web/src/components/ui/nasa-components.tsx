@@ -2,6 +2,8 @@
  * Reusable UI components for NASA page
  */
 
+import { ERRORS, IMAGES, NASA, UI } from '@/lib/constants'
+import { MediaType } from '@/lib/enums'
 import { APODResponse } from '@/types/nasa'
 import Image from 'next/image'
 import { ReactNode } from 'react'
@@ -36,7 +38,7 @@ interface ErrorMessageProps {
 }
 
 export function ErrorMessage({
-  title = 'Error',
+  title = ERRORS.GENERIC,
   message,
   onRetry,
   className = '',
@@ -87,8 +89,15 @@ interface APODCardProps {
 }
 
 export function APODCard({ apod, className = '' }: APODCardProps) {
-  const isVideo = apod.media_type === 'video'
-  const imageUrl = apod.hdurl || apod.url
+  const isVideo = apod.media_type === MediaType.VIDEO
+  const imageUrl = apod.url
+  const hdImageUrl = apod.hdurl || apod.url
+
+  // Check if the image is a GIF
+  const isGif = imageUrl?.toLowerCase().endsWith(NASA.FILE_EXTENSIONS.GIF)
+
+  // Provide fallback image when url is null/undefined/empty
+  const safeSrc = imageUrl && imageUrl.trim() ? imageUrl : IMAGES.FALLBACK
 
   return (
     <article
@@ -100,21 +109,30 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
           <iframe
             src={apod.url}
             title={apod.title}
-            className='h-full w-full'
-            frameBorder='0'
+            className='h-full w-full border-0'
             allowFullScreen
             loading='lazy'
           />
         ) : (
           <Image
-            src={imageUrl}
+            src={safeSrc}
             alt={apod.title}
             width={800}
             height={450}
             className='h-full w-full object-cover transition-transform hover:scale-105'
             priority={false}
             placeholder='blur'
-            blurDataURL='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=='
+            blurDataURL={IMAGES.PLACEHOLDER_BLUR}
+            // For GIFs, disable optimization to preserve animation
+            unoptimized={isGif}
+            // Add error handling
+            onError={e => {
+              console.error(ERRORS.IMAGE_LOAD_FAILED, safeSrc)
+              // Only fallback to fallback image if not already using it
+              if (safeSrc !== IMAGES.FALLBACK) {
+                e.currentTarget.src = IMAGES.FALLBACK
+              }
+            }}
           />
         )}
       </div>
@@ -128,11 +146,10 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
           </h2>
           <div className='mt-2 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400'>
             <time dateTime={apod.date}>
-              {new Date(apod.date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {new Date(apod.date).toLocaleDateString(
+                UI.DATE_FORMAT.LOCALE,
+                UI.DATE_FORMAT.OPTIONS
+              )}
             </time>
             <span className='inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200'>
               <svg className='h-3 w-3' viewBox='0 0 20 20' fill='currentColor'>
@@ -143,6 +160,7 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
                 />
               </svg>
               {apod.media_type}
+              {isGif && <span className='ml-1'>• GIF</span>}
             </span>
           </div>
           {apod.copyright && (
@@ -161,9 +179,9 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
 
         {/* Actions */}
         <div className='mt-6 flex gap-3'>
-          {!isVideo && apod.hdurl && (
+          {!isVideo && hdImageUrl && (
             <a
-              href={apod.hdurl}
+              href={hdImageUrl}
               target='_blank'
               rel='noopener noreferrer'
               className='inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
@@ -175,14 +193,12 @@ export function APODCard({ apod, className = '' }: APODCardProps) {
                   clipRule='evenodd'
                 />
               </svg>
-              Download HD
+              Download {isGif ? 'GIF' : 'HD'}
             </a>
           )}
           <button
             onClick={() => {
-              // eslint-disable-next-line no-undef
               if (typeof window !== 'undefined' && window.navigator?.share) {
-                // eslint-disable-next-line no-undef
                 window.navigator.share({ title: apod.title, url: apod.url })
               }
             }}
