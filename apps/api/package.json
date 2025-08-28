@@ -12,7 +12,7 @@
     "lint:fix": "poetry run black app tests && poetry run isort app tests",
     "type-check": "poetry run mypy app",
     "format": "poetry run black app tests && poetry run isort app tests",
-    "install": "poetry install",
+    "postinstall": "echo 'Python dependencies managed by Poetry - run poetry install separately'",
     "clean": "find . -type d -name __pycache__ -delete && find . -name '*.pyc' -delete"
   }
 }
