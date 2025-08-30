@@ -1,4 +1,5 @@
 'use client'
+import { useGiphyStore } from '@/stores/giphy-store'
 import {
   Grid,
   SearchBar,
@@ -9,8 +10,14 @@ import {
 import { useContext } from 'react'
 
 export default function GiphySearchPage() {
+  const { isGif } = useGiphyStore()
   return (
-    <SearchContextManager apiKey={process.env.NEXT_PUBLIC_GIPHY_API_KEY || ''}>
+    <SearchContextManager
+      apiKey={process.env.NEXT_PUBLIC_GIPHY_API_KEY || ''}
+      options={{
+        type: isGif ? 'gifs' : 'stickers',
+      }}
+    >
       <SearchComponents />
     </SearchContextManager>
   )
