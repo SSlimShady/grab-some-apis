@@ -56,7 +56,7 @@ jobs:
           pnpm rebuild
 
       - name: 🎨 Check code formatting
-        run: prettier --check "apps/web/**/*.{ts,tsx,js,jsx,md,json}"
+        run: npx prettier --check "apps/web/**/*.{ts,tsx,js,jsx,md,json}"
 
       - name: 🔍 Lint code
         working-directory: apps/web
