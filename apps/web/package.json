@@ -12,7 +12,10 @@
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
+    "@giphy/js-fetch-api": "^5.7.0",
+    "@giphy/react-components": "^10.1.0",
     "@tanstack/react-query": "catalog:",
+    "clsx": "catalog:",
     "next": "15.5.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.85.5",
     "@types/node": "^20",
