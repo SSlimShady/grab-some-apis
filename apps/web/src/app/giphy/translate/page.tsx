@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 
 export default function GiphyTranslatePage() {
   const [text, setText] = useState('')
-  const [gif, setGif] = useState<any | null>(null)
+  const [gif, setGif] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const { isGif } = useGiphyStore()
@@ -63,7 +63,7 @@ export default function GiphyTranslatePage() {
       )}
 
       {gif && !loading && (
-        <div key={`${isGif ? 'gif' : 'sticker'}-${gif.id}`}>
+        <div key={`${isGif ? 'gif' : 'sticker'}`}>
           <Gif gif={gif} width={800} />
         </div>
       )}

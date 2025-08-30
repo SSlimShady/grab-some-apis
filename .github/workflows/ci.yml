@@ -56,10 +56,11 @@ jobs:
           pnpm rebuild
 
       - name: 🎨 Check code formatting
-        run: pnpm format:check --filter=@grab-some-apis/web
+        run: prettier --check "apps/web/**/*.{ts,tsx,js,jsx,md,json}"
 
       - name: 🔍 Lint code
-        run: pnpm lint --filter=@grab-some-apis/web
+        working-directory: apps/web
+        run: pnpm lint
 
   frontend-typecheck:
     name: 📝 Frontend - Type Check
@@ -96,7 +97,8 @@ jobs:
           pnpm rebuild
 
       - name: 🏗️ Type check
-        run: pnpm type-check --filter=@grab-some-apis/web
+        working-directory: apps/web
+        run: pnpm type-check
 
   frontend-build:
     name: 🏗️ Frontend - Build
@@ -134,7 +136,8 @@ jobs:
           pnpm rebuild
 
       - name: 🏗️ Build application
-        run: pnpm build --filter=@grab-some-apis/web
+        working-directory: apps/web
+        run: pnpm build
 
       - name: 📤 Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -181,7 +184,8 @@ jobs:
           pnpm rebuild
 
       - name: 🧪 Run tests
-        run: pnpm test --filter=@grab-some-apis/web
+        working-directory: apps/web
+        run: pnpm test
 
   frontend-security:
     name: 🔒 Frontend - Security Audit
@@ -201,7 +205,8 @@ jobs:
           version: 10.15.0
 
       - name: 🔒 Audit dependencies
-        run: pnpm audit --audit-level moderate --filter=@grab-some-apis/web
+        working-directory: apps/web
+        run: pnpm audit --audit-level moderate
 
   # ===============================================
   # � BACKEND (Python API)
