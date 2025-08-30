@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from typing import Optional, Union
 
 import jwt
-from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
 from app.core.config import settings

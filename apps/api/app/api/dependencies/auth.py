@@ -2,7 +2,7 @@
 FastAPI dependency injection functions.
 """
 
-from typing import Generator
+from typing import Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -30,7 +30,7 @@ def get_current_user(
     return {"user_id": "test_user"}  # Placeholder
 
 
-def require_api_key(api_key: str = None):
+def require_api_key(api_key: Optional[str] = None):
     """Require API key for protected endpoints."""
     if not api_key:
         raise HTTPException(

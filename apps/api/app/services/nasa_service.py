@@ -4,7 +4,7 @@ NASA API Service - Refactored to use BaseAPIService
 
 import logging
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from app.core.circuit_breaker import circuit_breaker
 from app.core.config import settings
@@ -101,15 +101,18 @@ class NASAService(BaseAPIService):
         try:
             response_data = await self._make_request("planetary/apod", params)
 
-            # Validate the response structure
+            # Validate the response structure and convert to schema objects
             if isinstance(response_data, list):
+                validated_responses = []
                 for item in response_data:
                     self._validate_apod_response(item)
+                    validated_responses.append(APODResponse(**item))
+                logger.info("Successfully fetched APOD data")
+                return validated_responses
             else:
                 self._validate_apod_response(response_data)
-
-            logger.info("Successfully fetched APOD data")
-            return response_data
+                logger.info("Successfully fetched APOD data")
+                return APODResponse(**response_data)
 
         except APIError as e:
             # Re-raise as NASA-specific error

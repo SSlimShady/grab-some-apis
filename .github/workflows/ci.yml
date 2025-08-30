@@ -98,7 +98,9 @@ jobs:
 
       - name: 🏗️ Type check
         working-directory: apps/web
-        run: pnpm type-check
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm type-check
 
   frontend-build:
     name: 🏗️ Frontend - Build
@@ -271,7 +273,7 @@ jobs:
       - name: 🔍 Lint code
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
-        run: poetry run flake8 .
+        run: poetry run flake8 app/ --config=.flake8
 
   backend-typecheck:
     name: 📝 Backend - Type Check

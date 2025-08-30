@@ -33,7 +33,7 @@ mypy = "^1.17.1"
 pre-commit = "^4.3.0"
 httpx = "^0.28.1"
 autopep8 = "^2.3.2"
-safety = "^3.0.0"
+safety = "^2.3.5"
 bandit = "^1.8.0"
 
 [tool.poetry.scripts]

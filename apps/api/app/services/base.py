@@ -7,7 +7,6 @@ This module provides reusable patterns for all API services in the application.
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime
 from typing import Any, Dict, Optional, Union
 from urllib.parse import urljoin
 
@@ -222,7 +221,9 @@ class BaseAPIService(ABC):
         request_headers = {**self._build_headers(), **(headers or {})}
 
         client = await self._get_client()
-        last_exception = None
+        last_exception: Optional[
+            Union[APITimeoutError, APIConnectionError, APIServiceError]
+        ] = None
 
         # Retry logic with exponential backoff
         for attempt in range(self.max_retries + 1):
@@ -292,7 +293,7 @@ class BaseAPIService(ABC):
                 )
                 return data
 
-            except httpx.TimeoutException as e:
+            except httpx.TimeoutException:
                 last_exception = APITimeoutError(
                     f"Request to {endpoint} timed out after {self.timeout}s",
                     self.service_name,
