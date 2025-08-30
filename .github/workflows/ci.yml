@@ -17,9 +17,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Job 1: Code quality and linting
-  lint:
-    name: � Lint & Format
+  # ===============================================
+  # 🌐 FRONTEND (Next.js Web App)
+  # ===============================================
+
+  frontend-lint:
+    name: 🎨 Frontend - Lint & Format
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -53,14 +56,13 @@ jobs:
           pnpm rebuild
 
       - name: 🎨 Check code formatting
-        run: pnpm format:check --filter=!@grab-some-apis/api
+        run: pnpm format:check --filter=@grab-some-apis/web
 
       - name: 🔍 Lint code
-        run: pnpm lint --filter=!@grab-some-apis/api
+        run: pnpm lint --filter=@grab-some-apis/web
 
-  # Job 2: Type checking
-  typecheck:
-    name: 📝 Type Check
+  frontend-typecheck:
+    name: 📝 Frontend - Type Check
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -94,13 +96,12 @@ jobs:
           pnpm rebuild
 
       - name: 🏗️ Type check
-        run: pnpm type-check --filter=!@grab-some-apis/api
+        run: pnpm type-check --filter=@grab-some-apis/web
 
-  # Job 3: Build applications
-  build:
-    name: 🏗️ Build
+  frontend-build:
+    name: 🏗️ Frontend - Build
     runs-on: ubuntu-latest
-    needs: [lint, typecheck]
+    needs: [frontend-lint, frontend-typecheck]
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -132,23 +133,22 @@ jobs:
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm rebuild
 
-      - name: 🏗️ Build applications
-        run: pnpm build --filter=!@grab-some-apis/api
+      - name: 🏗️ Build application
+        run: pnpm build --filter=@grab-some-apis/web
 
       - name: 📤 Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: frontend-build-artifacts
           path: |
             apps/web/.next/
             apps/web/out/
           retention-days: 1
 
-  # Job 4: Test applications
-  test:
-    name: 🧪 Test
+  frontend-test:
+    name: 🧪 Frontend - Test
     runs-on: ubuntu-latest
-    needs: [lint, typecheck]
+    needs: [frontend-lint, frontend-typecheck]
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -181,11 +181,34 @@ jobs:
           pnpm rebuild
 
       - name: 🧪 Run tests
-        run: pnpm test --filter=!@grab-some-apis/api
+        run: pnpm test --filter=@grab-some-apis/web
 
-  # Job 5: Python quality checks
-  python:
-    name: 🐍 Python
+  frontend-security:
+    name: 🔒 Frontend - Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.15.0
+
+      - name: 🔒 Audit dependencies
+        run: pnpm audit --audit-level moderate --filter=@grab-some-apis/web
+
+  # ===============================================
+  # � BACKEND (Python API)
+  # ===============================================
+
+  backend-lint:
+    name: 🎨 Backend - Lint & Format
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -235,43 +258,224 @@ jobs:
         working-directory: apps/api
         run: poetry run black --check .
 
-      - name: 📦 Import check
+      - name: 📦 Import sort check
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
         run: poetry run isort --check-only .
 
-      - name: 🔍 Lint
+      - name: 🔍 Lint code
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
         run: poetry run flake8 .
+
+  backend-typecheck:
+    name: 📝 Backend - Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check for Python files
+        id: check-python
+        run: |
+          if find apps/api -name "*.py" -type f | head -1 | grep -q .; then
+            echo "python_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found Python files in apps/api"
+          else
+            echo "python_files=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No Python files found in apps/api"
+          fi
+
+      - name: 🐍 Setup Python
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install Poetry
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: 💾 Cache Poetry dependencies
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/cache@v4
+        with:
+          path: apps/api/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/api/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: 📦 Install Python dependencies
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry install --no-interaction --no-ansi
 
       - name: 📝 Type check
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
         run: poetry run mypy app
 
-      - name: 🧪 Test
+  backend-test:
+    name: 🧪 Backend - Test
+    runs-on: ubuntu-latest
+    needs: [backend-lint, backend-typecheck]
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check for Python files
+        id: check-python
+        run: |
+          if find apps/api -name "*.py" -type f | head -1 | grep -q .; then
+            echo "python_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found Python files in apps/api"
+          else
+            echo "python_files=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No Python files found in apps/api"
+          fi
+
+      - name: 🐍 Setup Python
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install Poetry
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: 💾 Cache Poetry dependencies
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/cache@v4
+        with:
+          path: apps/api/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/api/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: 📦 Install Python dependencies
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
-        run: poetry run pytest -v
+        run: poetry install --no-interaction --no-ansi
 
-  # Job 6: Security audit
-  security:
-    name: 🔒 Security
+      - name: 🧪 Run tests
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry run pytest -v --cov=app --cov-report=xml
+
+      - name: 📊 Upload coverage reports
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: codecov/codecov-action@v4
+        with:
+          file: apps/api/coverage.xml
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+  backend-security:
+    name: 🔒 Backend - Security Audit
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
+      - name: � Check for Python files
+        id: check-python
+        run: |
+          if find apps/api -name "*.py" -type f | head -1 | grep -q .; then
+            echo "python_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found Python files in apps/api"
+          else
+            echo "python_files=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No Python files found in apps/api"
+          fi
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+      - name: 🐍 Setup Python
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/setup-python@v4
         with:
-          version: 10.15.0
+          python-version: "3.11"
 
-      - name: 🔒 Audit dependencies
-        run: pnpm audit --audit-level moderate --filter=!@grab-some-apis/api
+      - name: 📦 Install Poetry
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: 💾 Cache Poetry dependencies
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/cache@v4
+        with:
+          path: apps/api/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('apps/api/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: 📦 Install Python dependencies
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry install --no-interaction --no-ansi
+
+      - name: � Security audit
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry run safety check
+
+      - name: 🔍 Bandit security scan
+        if: steps.check-python.outputs.python_files == 'true'
+        working-directory: apps/api
+        run: poetry run bandit -r app/ -f json -o bandit-report.json || true
+
+      - name: 📤 Upload security report
+        if: steps.check-python.outputs.python_files == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-security-report
+          path: apps/api/bandit-report.json
+          retention-days: 7
+
+  # ===============================================
+  # 📋 SUMMARY JOB
+  # ===============================================
+
+  summary:
+    name: � CI Summary
+    runs-on: ubuntu-latest
+    needs:
+      - frontend-lint
+      - frontend-typecheck
+      - frontend-build
+      - frontend-test
+      - frontend-security
+      - backend-lint
+      - backend-typecheck
+      - backend-test
+      - backend-security
+    if: always()
+    steps:
+      - name: 📋 Summary
+        run: |
+          echo "## 🚀 CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🌐 Frontend (Next.js)" >> $GITHUB_STEP_SUMMARY
+          echo "- Lint & Format: ${{ needs.frontend-lint.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Type Check: ${{ needs.frontend-typecheck.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build: ${{ needs.frontend-build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Test: ${{ needs.frontend-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Security: ${{ needs.frontend-security.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 Backend (Python API)" >> $GITHUB_STEP_SUMMARY
+          echo "- Lint & Format: ${{ needs.backend-lint.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Type Check: ${{ needs.backend-typecheck.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Test: ${{ needs.backend-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Security: ${{ needs.backend-security.result }}" >> $GITHUB_STEP_SUMMARY
