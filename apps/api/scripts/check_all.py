@@ -11,19 +11,15 @@ from pathlib import Path
 
 def run_command(command: list[str], description: str) -> bool:
     """Run a command and return success status."""
-    print(f"\n🔄 {description}...")
+    print(f"\n> {description}...")
     try:
-        result = subprocess.run(
-            command,
-            check=True,
-            capture_output=True,
-            text=True)
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
         if result.stdout:
             print(result.stdout)
-        print(f"✅ {description} completed successfully!")
+        print(f"✓ {description} completed successfully!")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ {description} failed: {e}")
+        print(f"✗ {description} failed: {e}")
         if e.stderr:
             print(f"Error output: {e.stderr}")
         if e.stdout:
@@ -40,7 +36,7 @@ def main():
         print("Error: Could not find 'app' directory. Make sure you're in the API project root.")
         sys.exit(1)
 
-    print("🚀 Running comprehensive code quality checks...")
+    print("Running comprehensive code quality checks...")
 
     success = True
 
@@ -68,18 +64,15 @@ def main():
         success = False
 
     # 3. Sort imports
-    if not run_command(["poetry", "run", "isort", "."],
-                       "Import sorting (isort)"):
+    if not run_command(["poetry", "run", "isort", "."], "Import sorting (isort)"):
         success = False
 
     # 4. Lint code
-    if not run_command(["poetry", "run", "flake8", "app/",
-                       "--config=.flake8"], "Code linting (flake8)"):
+    if not run_command(["poetry", "run", "flake8", "app/", "--config=.flake8"], "Code linting (flake8)"):
         success = False
 
     # 5. Type checking
-    if not run_command(["poetry", "run", "mypy", "app"],
-                       "Type checking (mypy)"):
+    if not run_command(["poetry", "run", "mypy", "app"], "Type checking (mypy)"):
         success = False
 
     # 6. Security audit
@@ -105,12 +98,12 @@ def main():
         ],
         "Security scan (bandit)",
     ):
-        print("⚠️  Bandit scan completed with warnings (check bandit-report.json)")
+        print("Warning: Bandit scan completed with warnings (check bandit-report.json)")
 
     if success:
-        print("\n🎉 All checks passed! Your code is ready for deployment.")
+        print("\nAll checks passed! Your code is ready for deployment.")
     else:
-        print("\n❌ Some checks failed. Please fix the issues above.")
+        print("\nSome checks failed. Please fix the issues above.")
         sys.exit(1)
 
 

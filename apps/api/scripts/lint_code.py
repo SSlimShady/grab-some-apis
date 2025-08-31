@@ -13,11 +13,7 @@ def run_command(command: list[str], description: str) -> bool:
     """Run a command and return success status."""
     print(f"Running {description}...")
     try:
-        result = subprocess.run(
-            command,
-            check=True,
-            capture_output=True,
-            text=True)
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
         if result.stdout:
             print(result.stdout)
         return True
@@ -42,8 +38,7 @@ def main():
     success = True
 
     # Run flake8
-    if not run_command(["poetry", "run", "flake8", "app/",
-                       "--config=.flake8"], "flake8 linting"):
+    if not run_command(["poetry", "run", "flake8", "app/", "--config=.flake8"], "flake8 linting"):
         success = False
 
     # Run mypy
@@ -51,14 +46,13 @@ def main():
         success = False
 
     # Run isort check
-    if not run_command(
-            ["poetry", "run", "isort", "--check-only", "."], "isort import sorting check"):
+    if not run_command(["poetry", "run", "isort", "--check-only", "."], "isort import sorting check"):
         success = False
 
     if success:
-        print("✅ All code quality checks passed!")
+        print("All code quality checks passed!")
     else:
-        print("❌ Some code quality checks failed. Check the output above.")
+        print("Some code quality checks failed. Check the output above.")
         sys.exit(1)
 
 

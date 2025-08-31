@@ -56,8 +56,7 @@ class NASAService(BaseAPIService):
                 "Consider getting a free API key from https://api.nasa.gov/"
             )
 
-    def _build_auth_params(
-            self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _build_auth_params(self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Build authentication parameters for NASA API."""
         auth_params = {"api_key": self.api_key}
         if params:
@@ -65,8 +64,7 @@ class NASAService(BaseAPIService):
         return auth_params
 
     @circuit_breaker(name="nasa_apod", failure_threshold=5, timeout=30)
-    async def get_apod(
-            self, request: APODRequest) -> APODResponse | List[APODResponse]:
+    async def get_apod(self, request: APODRequest) -> APODResponse | List[APODResponse]:
         """
         Get Astronomy Picture of the Day (APOD) from NASA API.
 
@@ -122,12 +120,10 @@ class NASAService(BaseAPIService):
     def _validate_apod_response(self, data: Dict[str, Any]) -> None:
         """Validate APOD response structure."""
         required_fields = ["title", "explanation", "media_type"]
-        missing_fields = [
-            field for field in required_fields if field not in data]
+        missing_fields = [field for field in required_fields if field not in data]
 
         if missing_fields:
-            raise NASAValidationError(
-                f"Missing required fields in APOD response: {missing_fields}")
+            raise NASAValidationError(f"Missing required fields in APOD response: {missing_fields}")
 
     async def health_check(self) -> Dict[str, Any]:
         """
@@ -139,8 +135,7 @@ class NASAService(BaseAPIService):
         try:
             # Make a simple APOD request to test connectivity
             today = date.today()
-            params = self._build_auth_params(
-                {"date": today.strftime("%Y-%m-%d")})
+            params = self._build_auth_params({"date": today.strftime("%Y-%m-%d")})
 
             response_data = await self._make_request("planetary/apod", params)
 

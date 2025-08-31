@@ -69,8 +69,7 @@ async def get_circuit_breaker_status() -> Dict[str, Any]:
     total_successes = sum(data["total_successes"] for data in metrics.values())
 
     average_success_rate = (
-        sum(data["success_rate_percent"]
-            for data in metrics.values()) / len(metrics) if metrics else 0
+        sum(data["success_rate_percent"] for data in metrics.values()) / len(metrics) if metrics else 0
     )
 
     overall_status = "healthy"

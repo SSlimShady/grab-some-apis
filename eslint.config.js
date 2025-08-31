@@ -137,7 +137,11 @@ export default [
 
   // Configuration files
   {
-    files: ['**/*.config.{js,ts,mjs}', '**/.*rc.{js,ts}', 'tools/**/*.js'],
+    files: [
+      '**/*.config.{js,ts,mjs}',
+      '**/.*rc.{js,ts}',
+      'tools/**/*.{js,cjs}',
+    ],
     languageOptions: {
       globals: {
         module: 'readonly',
@@ -152,6 +156,7 @@ export default [
     },
     rules: {
       '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'no-undef': 'off',
       'no-console': 'off',

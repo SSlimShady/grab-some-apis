@@ -41,7 +41,7 @@
     "env:switch": "node tools/switch-env.js",
     "env:status": "node tools/switch-env.js --status",
     "env:check": "node tools/validate-env.js",
-    "format:python": "cd apps/api && poetry run black . && poetry run isort . && poetry run autopep8 --in-place --aggressive --max-line-length=79 --recursive .",
+    "format:python": "cd apps/api && poetry run black . --line-length 120 && poetry run isort . && poetry run autopep8 --in-place --aggressive --max-line-length=120 --recursive .",
     "prepare": "node -e \"if (process.env.NODE_ENV !== 'production' && !process.env.CI) { const { execSync } = require('child_process'); execSync('husky', { stdio: 'inherit' }); }\""
   },
   "devDependencies": {

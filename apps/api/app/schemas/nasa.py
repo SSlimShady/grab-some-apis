@@ -31,8 +31,7 @@ class APODRequest(BaseModel):
         description="End date for APOD in YYYY-MM-DD format. Optional for range queries.",
         pattern=r"^\d{4}-\d{2}-\d{2}$",
     )
-    count: Optional[int] = Field(
-        None, description="Number of random APOD images to retrieve.")
+    count: Optional[int] = Field(None, description="Number of random APOD images to retrieve.")
     thumbs: Optional[bool] = Field(
         True,
         description="Whether to include thumbnail images in the response in case of video.",
@@ -48,8 +47,7 @@ class APODRequest(BaseModel):
             try:
                 parsed_date = datetime.strptime(v, "%Y-%m-%d").date()
             except ValueError:
-                raise ValueError(
-                    f"Invalid {field_name} format. Expected YYYY-MM-DD, got: {v}")
+                raise ValueError(f"Invalid {field_name} format. Expected YYYY-MM-DD, got: {v}")
 
             min_date = date(1995, 6, 16)  # First APOD date
 
@@ -60,8 +58,7 @@ class APODRequest(BaseModel):
 
             # Don't allow future dates beyond today
             if parsed_date > date.today():
-                raise ValueError(
-                    f"{field_name.replace('_', ' ').title()} cannot be in the future. Got: {v}")
+                raise ValueError(f"{field_name.replace('_', ' ').title()} cannot be in the future. Got: {v}")
 
         return v
 
@@ -72,15 +69,12 @@ class APODRequest(BaseModel):
         # by default
 
         # Check that only one type of date parameter is used
-        if self.date is not None and (
-                self.start_date is not None or self.end_date is not None):
-            raise ValueError(
-                'Cannot use "date" parameter with "start_date" or "end_date"')
+        if self.date is not None and (self.start_date is not None or self.end_date is not None):
+            raise ValueError('Cannot use "date" parameter with "start_date" or "end_date"')
 
         # If using date range, both start_date and end_date must be provided
         if (self.start_date is not None) != (self.end_date is not None):
-            raise ValueError(
-                'Both "start_date" and "end_date" must be provided for date range queries')
+            raise ValueError('Both "start_date" and "end_date" must be provided for date range queries')
 
         # Validate that start_date < end_date
         if self.start_date is not None and self.end_date is not None:
@@ -89,13 +83,11 @@ class APODRequest(BaseModel):
                 end = datetime.strptime(self.end_date, "%Y-%m-%d").date()
 
                 if start >= end:
-                    raise ValueError(
-                        f"Start date ({self.start_date}) must be before end date ({self.end_date})")
+                    raise ValueError(f"Start date ({self.start_date}) must be before end date ({self.end_date})")
 
                 # Check range is not too large (max 1 year for performance)
                 if (end - start).days > 365:
-                    raise ValueError(
-                        f"Date range cannot exceed 365 days. Current range: {(end - start).days} days")
+                    raise ValueError(f"Date range cannot exceed 365 days. Current range: {(end - start).days} days")
 
             except ValueError as e:
                 if "does not match format" in str(e):

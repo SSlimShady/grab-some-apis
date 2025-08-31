@@ -21,13 +21,12 @@ def main():
     print("📝 Running type checking...")
 
     try:
-        result = subprocess.run(
-            ["poetry", "run", "mypy", "app"], check=True, capture_output=True, text=True)
+        result = subprocess.run(["poetry", "run", "mypy", "app"], check=True, capture_output=True, text=True)
         if result.stdout:
             print(result.stdout)
-        print("✅ Type checking completed successfully!")
+        print("Type checking completed successfully!")
     except subprocess.CalledProcessError as e:
-        print(f"❌ Type checking failed: {e}")
+        print(f"Type checking failed: {e}")
         if e.stderr:
             print(f"Error output: {e.stderr}")
         if e.stdout:

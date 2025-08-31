@@ -1,7 +1,7 @@
 {
   "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
   "*.{json,md,yml,yaml}": ["prettier --write"],
-  "apps/api/**/*.py": ["pnpm -w run format:python"],
+  "apps/api/**/*.py": ["node tools/format-python.cjs"],
   "package.json": ["prettier --write"],
   "*.{css,scss}": ["prettier --write"]
 }

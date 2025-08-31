@@ -100,8 +100,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         await self.db.refresh(db_obj)
         return db_obj
 
-    async def update(
-            self, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> Optional[ModelType]:
+    async def update(self, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> Optional[ModelType]:
         """
         Update an existing record.
 

@@ -14,8 +14,7 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_access_token(
-        subject: Union[str, int], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(subject: Union[str, int], expires_delta: Optional[timedelta] = None) -> str:
     """
     Create a JWT access token.
 
@@ -29,10 +28,7 @@ def create_access_token(
         expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(
-        to_encode,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
@@ -67,9 +63,7 @@ def decode_access_token(token: str) -> Optional[str]:
         # Returns: "user_123" or None if invalid
     """
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[
-                settings.ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: str = payload.get("sub")
         return user_id
     except jwt.PyJWTError:

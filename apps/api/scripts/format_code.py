@@ -13,11 +13,7 @@ def run_command(command: list[str], description: str) -> bool:
     """Run a command and return success status."""
     print(f"Running {description}...")
     try:
-        result = subprocess.run(
-            command,
-            check=True,
-            capture_output=True,
-            text=True)
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
         if result.stdout:
             print(result.stdout)
         return True
@@ -37,11 +33,10 @@ def main():
         print("Error: Could not find 'app' directory. Make sure you're in the API project root.")
         sys.exit(1)
 
-    print("🎨 Formatting Python code...")
+    print("Formatting Python code...")
 
     # Run Black formatter
-    black_success = run_command(
-        ["poetry", "run", "black", "app/", "--line-length", "120"], "Black formatter")
+    black_success = run_command(["poetry", "run", "black", "app/", "--line-length", "120"], "Black formatter")
 
     # Run autopep8 for additional fixes
     autopep8_success = run_command(
@@ -59,9 +54,9 @@ def main():
     )
 
     if black_success and autopep8_success:
-        print("✅ Code formatting completed successfully!")
+        print("Code formatting completed successfully!")
     else:
-        print("❌ Some formatting tools failed. Check the output above.")
+        print("Some formatting tools failed. Check the output above.")
         sys.exit(1)
 
 

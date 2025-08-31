@@ -28,8 +28,7 @@ router = APIRouter()
 )
 async def get_characters_by_ids(
     characters_id: str,
-    rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service),
+    rick_and_morty_service: RickAndMortyService = Depends(get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_characters_by_ids(characters_id)
@@ -58,8 +57,7 @@ async def get_characters_by_ids(
 )
 async def get_characters(
     request: RickAndMortyCharacterRequest = Depends(),
-    rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service),
+    rick_and_morty_service: RickAndMortyService = Depends(get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_characters(request)
@@ -88,8 +86,7 @@ async def get_characters(
 )
 async def get_locations(
     request: RickAndMortyLocationRequest = Depends(),
-    rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service),
+    rick_and_morty_service: RickAndMortyService = Depends(get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_locations(request)
@@ -118,8 +115,7 @@ async def get_locations(
 )
 async def get_episodes(
     request: RickAndMortyEpisodeRequest = Depends(),
-    rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service),
+    rick_and_morty_service: RickAndMortyService = Depends(get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_episodes(request)

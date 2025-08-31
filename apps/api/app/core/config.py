@@ -102,15 +102,13 @@ class Settings(BaseSettings):
         if self.DEBUG:
             print("🔧 Configuration Debug Info:")
             print(f"   API_ROOT path: {API_ROOT}")
-            print(
-                f"   .env.local exists: {(API_ROOT / '.env.local').exists()}")
+            print(f"   .env.local exists: {(API_ROOT / '.env.local').exists()}")
             print(f"   .env exists: {(API_ROOT / '.env').exists()}")
             print(f"   DEBUG: {self.DEBUG} (type: {type(self.DEBUG)})")
             print(f"   HOST: {self.HOST}")
             print(f"   PORT: {self.PORT}")
             print(f"   RELOAD: {self.RELOAD}")
-            nasa_key_display = "***" + \
-                self.NASA_API_KEY[-4:] if len(self.NASA_API_KEY) > 4 else "***"
+            nasa_key_display = "***" + self.NASA_API_KEY[-4:] if len(self.NASA_API_KEY) > 4 else "***"
             print(f"   NASA_API_KEY: {nasa_key_display}")
 
 
