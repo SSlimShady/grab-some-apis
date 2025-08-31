@@ -69,10 +69,8 @@ async def get_circuit_breaker_status() -> Dict[str, Any]:
     total_successes = sum(data["total_successes"] for data in metrics.values())
 
     average_success_rate = (
-        sum(data["success_rate_percent"] for data in metrics.values())
-        / len(metrics)
-        if metrics
-        else 0
+        sum(data["success_rate_percent"]
+            for data in metrics.values()) / len(metrics) if metrics else 0
     )
 
     overall_status = "healthy"
@@ -129,9 +127,7 @@ async def get_circuit_breaker_details(circuit_name: str) -> Dict[str, Any]:
     return {
         "circuit_name": circuit_name,
         "metrics": all_metrics[circuit_name],
-        "recommendations": _get_circuit_recommendations(
-            all_metrics[circuit_name]
-        ),
+        "recommendations": _get_circuit_recommendations(all_metrics[circuit_name]),
     }
 
 
@@ -217,9 +213,7 @@ def _get_circuit_recommendations(metrics: Dict[str, Any]) -> Dict[str, str]:
     recommendations = {}
 
     if metrics["is_open"]:
-        recommendations["immediate"] = (
-            "Circuit is OPEN - external service is likely down. Check service health."
-        )
+        recommendations["immediate"] = "Circuit is OPEN - external service is likely down. Check service health."
         recommendations["action"] = (
             f"Wait {metrics['timeout_seconds']} seconds for automatic retry or check external service status."
         )
@@ -228,23 +222,18 @@ def _get_circuit_recommendations(metrics: Dict[str, Any]) -> Dict[str, str]:
         recommendations["warning"] = (
             f"Success rate is {metrics['success_rate_percent']}% - monitor external service closely."
         )
-        recommendations["action"] = (
-            "Consider increasing timeout or checking external service performance."
-        )
+        recommendations["action"] = "Consider increasing timeout or checking external service performance."
 
     elif metrics["failure_count"] > 0:
-        recommendations["info"] = (
-            f"Recent failures detected ({metrics['failure_count']}). Monitor for patterns."
-        )
+        recommendations["info"] = f"Recent failures detected ({metrics['failure_count']}). Monitor for patterns."
 
     else:
-        recommendations["status"] = (
-            "Circuit breaker is healthy and operating normally."
-        )
+        recommendations["status"] = "Circuit breaker is healthy and operating normally."
 
     if metrics["circuit_opened_count"] > 5:
         recommendations["concern"] = (
-            f"Circuit has opened {metrics['circuit_opened_count']} times. Consider adjusting thresholds or improving external service reliability."
+            f"Circuit has opened {metrics['circuit_opened_count']} times. "
+            f"Consider adjusting thresholds or improving external service reliability."
         )
 
     return recommendations
