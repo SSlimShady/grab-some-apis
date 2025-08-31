@@ -12,8 +12,9 @@ router = APIRouter()
 
 # Include root-level routes (non-versioned)
 router.include_router(
-    circuit_breakers.router, prefix="/monitoring", tags=["monitoring"]
-)
+    circuit_breakers.router,
+    prefix="/monitoring",
+    tags=["monitoring"])
 
 # Include versioned routes
 router.include_router(v1_router, prefix="/v1", tags=["v1"])

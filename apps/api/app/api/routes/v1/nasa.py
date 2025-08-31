@@ -76,6 +76,5 @@ async def get_astronomy_picture_of_day(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=(
-                f"An unexpected error occurred while fetching APOD data: {str(err)}"
-            ),
+                f"An unexpected error occurred while fetching APOD data: {str(err)}"),
         )

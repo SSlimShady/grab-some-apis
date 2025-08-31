@@ -31,8 +31,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup
     logger.info("Starting up Grab Some APIs backend...")
     logger.info(
-        f"Environment: {'Development' if settings.DEBUG else 'Production'}"
-    )
+        f"Environment: {'Development' if settings.DEBUG else 'Production'}")
     logger.info(f"API Version: {settings.VERSION}")
 
     # Initialize shared HTTP client
@@ -73,9 +72,8 @@ def create_application() -> FastAPI:
     # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            str(origin) for origin in settings.BACKEND_CORS_ORIGINS
-        ],
+        allow_origins=[str(origin)
+                       for origin in settings.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -87,8 +85,7 @@ def create_application() -> FastAPI:
     # Add exception handlers for better error responses
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
-        request: Request, exc: RequestValidationError
-    ):
+            request: Request, exc: RequestValidationError):
         """Handle FastAPI request validation errors (422 -> 400)."""
         return JSONResponse(
             status_code=400,
@@ -107,8 +104,7 @@ def create_application() -> FastAPI:
 
     @app.exception_handler(ValidationError)
     async def pydantic_validation_exception_handler(
-        request: Request, exc: ValidationError
-    ):
+            request: Request, exc: ValidationError):
         """Handle Pydantic validation errors."""
         return JSONResponse(
             status_code=400,
@@ -132,11 +128,7 @@ def create_application() -> FastAPI:
         return {
             "message": f"Welcome to {settings.PROJECT_NAME} API",
             "version": settings.VERSION,
-            "docs": (
-                "/docs"
-                if settings.DEBUG
-                else "Documentation disabled in production"
-            ),
+            "docs": ("/docs" if settings.DEBUG else "Documentation disabled in production"),
             "status": "healthy",
         }
 

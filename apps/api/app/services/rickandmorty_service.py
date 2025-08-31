@@ -57,45 +57,35 @@ class RickAndMortyService(BaseAPIService):
     ) -> RickAndMortyCharacterResponse | list[RickAndMortyCharacterResponse]:
         try:
             logger.info(
-                f"Fetching Rick and Morty characters with params: {request.model_dump(exclude_none=True)}"
-            )
-            response = await self._make_request(
-                "character", params=request.model_dump(exclude_none=True)
-            )
+                f"Fetching Rick and Morty characters with params: {request.model_dump(exclude_none=True)}")
+            response = await self._make_request("character", params=request.model_dump(exclude_none=True))
             if isinstance(response, list):
-                return [
-                    RickAndMortyCharacterResponse(**item) for item in response
-                ]
+                return [RickAndMortyCharacterResponse(
+                    **item) for item in response]
             else:
                 return RickAndMortyCharacterResponse(**response)
         except APIError as e:
             raise RickAndMortyAPIError(
-                e.status_code, e.message, e.response_data
-            )
+                e.status_code, e.message, e.response_data)
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")
             raise RickAndMortyAPIError(500, "Internal Server Error")
 
     @circuit_breaker(name="rick_and_morty", failure_threshold=5, timeout=30)
     async def get_characters_by_ids(
-        self, characters_id: str
-    ) -> RickAndMortyCharacter | list[RickAndMortyCharacter]:
+            self, characters_id: str) -> RickAndMortyCharacter | list[RickAndMortyCharacter]:
         try:
             logger.info(
-                f"Fetching Rick and Morty characters with IDs: {characters_id}"
-            )
+                f"Fetching Rick and Morty characters with IDs: {characters_id}")
 
-            response = await self._make_request(
-                "character/{id}", path_params={"id": characters_id}
-            )
+            response = await self._make_request("character/{id}", path_params={"id": characters_id})
             if isinstance(response, list):
                 return [RickAndMortyCharacter(**item) for item in response]
             else:
                 return RickAndMortyCharacter(**response)
         except APIError as e:
             raise RickAndMortyAPIError(
-                e.status_code, e.message, e.response_data
-            )
+                e.status_code, e.message, e.response_data)
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")
             raise RickAndMortyAPIError(500, "Internal Server Error")
@@ -106,21 +96,16 @@ class RickAndMortyService(BaseAPIService):
     ) -> RickAndMortyLocationResponse | list[RickAndMortyLocationResponse]:
         try:
             logger.info(
-                f"Fetching Rick and Morty locations with params: {request.model_dump(exclude_none=True)}"
-            )
-            response = await self._make_request(
-                "location", params=request.model_dump(exclude_none=True)
-            )
+                f"Fetching Rick and Morty locations with params: {request.model_dump(exclude_none=True)}")
+            response = await self._make_request("location", params=request.model_dump(exclude_none=True))
             if isinstance(response, list):
-                return [
-                    RickAndMortyLocationResponse(**item) for item in response
-                ]
+                return [RickAndMortyLocationResponse(
+                    **item) for item in response]
             else:
                 return RickAndMortyLocationResponse(**response)
         except APIError as e:
             raise RickAndMortyAPIError(
-                e.status_code, e.message, e.response_data
-            )
+                e.status_code, e.message, e.response_data)
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")
             raise RickAndMortyAPIError(500, "Internal Server Error")
@@ -131,21 +116,16 @@ class RickAndMortyService(BaseAPIService):
     ) -> RickAndMortyEpisodeResponse | list[RickAndMortyEpisodeResponse]:
         try:
             logger.info(
-                f"Fetching Rick and Morty episodes with params: {request.model_dump(exclude_none=True)}"
-            )
-            response = await self._make_request(
-                "episode", params=request.model_dump(exclude_none=True)
-            )
+                f"Fetching Rick and Morty episodes with params: {request.model_dump(exclude_none=True)}")
+            response = await self._make_request("episode", params=request.model_dump(exclude_none=True))
             if isinstance(response, list):
-                return [
-                    RickAndMortyEpisodeResponse(**item) for item in response
-                ]
+                return [RickAndMortyEpisodeResponse(
+                    **item) for item in response]
             else:
                 return RickAndMortyEpisodeResponse(**response)
         except APIError as e:
             raise RickAndMortyAPIError(
-                e.status_code, e.message, e.response_data
-            )
+                e.status_code, e.message, e.response_data)
         except Exception as e:
             logger.error(f"Unexpected error occurred: {e}")
             raise RickAndMortyAPIError(500, "Internal Server Error")

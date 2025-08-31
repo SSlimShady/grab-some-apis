@@ -39,9 +39,10 @@ pip-audit = "^2.9.0"
 [tool.poetry.scripts]
 dev = "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
 start = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
-format = "black app/ --line-length 120 && autopep8 --max-line-length=120 --aggressive --in-place --recursive app/"
-lint = "flake8 app/ --config=.flake8"
-typecheck = "mypy app"
+format = "scripts.format_code:main"
+lint = "scripts.lint_code:main"
+typecheck = "scripts.typecheck:main"
+check = "scripts.check_all:main"
 
 [build-system]
 requires = ["poetry-core"]

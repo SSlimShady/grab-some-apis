@@ -40,9 +40,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Example:
             api = await api_repo.get("123e4567-e89b-12d3-a456-426614174000")
         """
-        result = await self.db.execute(
-            select(self.model).where(getattr(self.model, "id") == id)
-        )
+        result = await self.db.execute(select(self.model).where(getattr(self.model, "id") == id))
         return result.scalar_one_or_none()
 
     async def get_all(
@@ -103,8 +101,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     async def update(
-        self, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]
-    ) -> Optional[ModelType]:
+            self, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> Optional[ModelType]:
         """
         Update an existing record.
 
@@ -121,11 +118,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         else:
             obj_data = dict(obj_in)
 
-        await self.db.execute(
-            update(self.model)
-            .where(getattr(self.model, "id") == id)
-            .values(**obj_data)
-        )
+        await self.db.execute(update(self.model).where(getattr(self.model, "id") == id).values(**obj_data))
 
         return await self.get(id)
 
@@ -137,9 +130,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             deleted = await api_repo.delete(api_id)
             # Returns: True if deleted, False if not found
         """
-        result = await self.db.execute(
-            delete(self.model).where(getattr(self.model, "id") == id)
-        )
+        result = await self.db.execute(delete(self.model).where(getattr(self.model, "id") == id))
         return result.rowcount > 0
 
     async def count(self, filters: Optional[Dict[str, Any]] = None) -> int:
@@ -168,9 +159,5 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Example:
             exists = await api_repo.exists(api_id)
         """
-        result = await self.db.execute(
-            select(getattr(self.model, "id")).where(
-                getattr(self.model, "id") == id
-            )
-        )
+        result = await self.db.execute(select(getattr(self.model, "id")).where(getattr(self.model, "id") == id))
         return result.scalar_one_or_none() is not None

@@ -163,8 +163,7 @@ class BaseAPIService(ABC):
         self._client_manager = HTTPClientManager()
 
         logger.info(
-            f"{service_name} service initialized with base_url={base_url}"
-        )
+            f"{service_name} service initialized with base_url={base_url}")
 
     async def _get_client(self) -> httpx.AsyncClient:
         """Get the shared HTTP client."""
@@ -222,24 +221,22 @@ class BaseAPIService(ABC):
                 endpoint = endpoint.format(**path_params)
             except KeyError as e:
                 raise APIValidationError(
-                    f"Missing required path parameter: {e}", self.service_name
-                )
+                    f"Missing required path parameter: {e}",
+                    self.service_name)
         url = urljoin(self.base_url + "/", endpoint.lstrip("/"))
         request_params = self._build_auth_params(params or {})
         request_headers = {**self._build_headers(), **(headers or {})}
 
         client = await self._get_client()
-        last_exception: Optional[
-            Union[APITimeoutError, APIConnectionError, APIServiceError]
-        ] = None
+        last_exception: Optional[Union[APITimeoutError,
+                                       APIConnectionError, APIServiceError]] = None
 
         # Retry logic with exponential backoff
         for attempt in range(self.max_retries + 1):
             try:
                 logger.debug(
                     f"{self.service_name}: {method} {url} "
-                    f"(attempt {attempt + 1}/{self.max_retries + 1})"
-                )
+                    f"(attempt {attempt + 1}/{self.max_retries + 1})")
 
                 response = await client.request(
                     method=method,
@@ -297,8 +294,7 @@ class BaseAPIService(ABC):
                     data = {"content": response.text}
 
                 logger.info(
-                    f"{self.service_name}: Successfully fetched data from {endpoint}"
-                )
+                    f"{self.service_name}: Successfully fetched data from {endpoint}")
                 return data
 
             except httpx.TimeoutException:
@@ -307,16 +303,13 @@ class BaseAPIService(ABC):
                     self.service_name,
                 )
                 logger.warning(
-                    f"{self.service_name}: Timeout on attempt {attempt + 1}"
-                )
+                    f"{self.service_name}: Timeout on attempt {attempt + 1}")
 
             except httpx.ConnectError as e:
                 last_exception = APIConnectionError(
-                    f"Failed to connect: {e}", self.service_name
-                )
+                    f"Failed to connect: {e}", self.service_name)
                 logger.warning(
-                    f"{self.service_name}: Connection error on attempt {attempt + 1}"
-                )
+                    f"{self.service_name}: Connection error on attempt {attempt + 1}")
 
             except APIError:
                 # Don't retry API errors (client errors, auth issues, etc.)
@@ -324,24 +317,20 @@ class BaseAPIService(ABC):
 
             except Exception as e:
                 last_exception = APIServiceError(
-                    f"{self.service_name}: Unexpected error: {e}"
-                )
+                    f"{self.service_name}: Unexpected error: {e}")
                 logger.error(
-                    f"{self.service_name}: Unexpected error on attempt {attempt + 1}: {e}"
-                )
+                    f"{self.service_name}: Unexpected error on attempt {attempt + 1}: {e}")
 
             # Wait before retry (exponential backoff)
             if attempt < self.max_retries:
                 wait_time = 2**attempt  # 1s, 2s, 4s
                 logger.info(
-                    f"{self.service_name}: Retrying in {wait_time}s..."
-                )
+                    f"{self.service_name}: Retrying in {wait_time}s...")
                 await asyncio.sleep(wait_time)
 
         # All retries exhausted
         raise last_exception or APIServiceError(
-            f"{self.service_name}: All retry attempts failed"
-        )
+            f"{self.service_name}: All retry attempts failed")
 
     @abstractmethod
     async def health_check(self) -> Dict[str, Any]:

@@ -107,8 +107,7 @@ class CircuitBreaker:
         self.circuit_opened_count = 0
 
         logger.info(
-            f"Circuit breaker '{name}' initialized: threshold={failure_threshold}, timeout={timeout}s"
-        )
+            f"Circuit breaker '{name}' initialized: threshold={failure_threshold}, timeout={timeout}s")
 
     def is_open(self) -> bool:
         """
@@ -119,15 +118,11 @@ class CircuitBreaker:
         """
         if self.state == CircuitBreakerState.OPEN:
             # Check if timeout period has passed
-            if (
-                self.last_failure_time
-                and datetime.now() - self.last_failure_time
-                > timedelta(seconds=self.timeout)
-            ):
+            if self.last_failure_time and datetime.now(
+            ) - self.last_failure_time > timedelta(seconds=self.timeout):
                 self.state = CircuitBreakerState.HALF_OPEN
                 logger.info(
-                    f"Circuit breaker '{self.name}' moved to HALF_OPEN for testing"
-                )
+                    f"Circuit breaker '{self.name}' moved to HALF_OPEN for testing")
                 return False
             return True
         return False
@@ -144,8 +139,7 @@ class CircuitBreaker:
         if self.state == CircuitBreakerState.HALF_OPEN:
             self.state = CircuitBreakerState.CLOSED
             logger.info(
-                f"Circuit breaker '{self.name}' closed after successful test"
-            )
+                f"Circuit breaker '{self.name}' closed after successful test")
 
         logger.debug(f"Circuit breaker '{self.name}' recorded success")
 
@@ -158,10 +152,7 @@ class CircuitBreaker:
         self.last_failure_time = datetime.now()
 
         # Open circuit if failure threshold reached
-        if (
-            self.failure_count >= self.failure_threshold
-            and self.state == CircuitBreakerState.CLOSED
-        ):
+        if self.failure_count >= self.failure_threshold and self.state == CircuitBreakerState.CLOSED:
             self.state = CircuitBreakerState.OPEN
             self.circuit_opened_count += 1
             logger.warning(
@@ -172,12 +163,10 @@ class CircuitBreaker:
         elif self.state == CircuitBreakerState.HALF_OPEN:
             self.state = CircuitBreakerState.OPEN
             logger.warning(
-                f"Circuit breaker '{self.name}' returned to OPEN after failed test"
-            )
+                f"Circuit breaker '{self.name}' returned to OPEN after failed test")
 
         logger.debug(
-            f"Circuit breaker '{self.name}' recorded failure ({self.failure_count}/{self.failure_threshold})"
-        )
+            f"Circuit breaker '{self.name}' recorded failure ({self.failure_count}/{self.failure_threshold})")
 
     def get_metrics(self) -> Dict[str, Any]:
         """
@@ -188,21 +177,16 @@ class CircuitBreaker:
         """
         now = datetime.now()
         uptime = (
-            (now - self.last_success_time).total_seconds()
-            if self.last_success_time
-            else 0
-        )
+            now
+            - self.last_success_time).total_seconds() if self.last_success_time else 0
         downtime = (
-            (now - self.last_failure_time).total_seconds()
-            if self.last_failure_time
-            else 0
-        )
+            now
+            - self.last_failure_time).total_seconds() if self.last_failure_time else 0
 
         success_rate = (
-            (self.total_successes / self.total_requests * 100)
-            if self.total_requests > 0
-            else 0
-        )
+            self.total_successes
+            / self.total_requests
+            * 100) if self.total_requests > 0 else 0
 
         return {
             "name": self.name,
@@ -217,16 +201,8 @@ class CircuitBreaker:
             "circuit_opened_count": self.circuit_opened_count,
             "failure_threshold": self.failure_threshold,
             "timeout_seconds": self.timeout,
-            "last_failure_time": (
-                self.last_failure_time.isoformat()
-                if self.last_failure_time
-                else None
-            ),
-            "last_success_time": (
-                self.last_success_time.isoformat()
-                if self.last_success_time
-                else None
-            ),
+            "last_failure_time": (self.last_failure_time.isoformat() if self.last_failure_time else None),
+            "last_success_time": (self.last_success_time.isoformat() if self.last_success_time else None),
             "uptime_seconds": uptime,
             "downtime_seconds": downtime,
         }
@@ -309,10 +285,8 @@ class CircuitBreakerRegistry:
     @classmethod
     def get_all_metrics(cls) -> Dict[str, Any]:
         """Get metrics for all registered circuit breakers."""
-        return {
-            name: breaker.get_metrics()
-            for name, breaker in cls._circuit_breakers.items()
-        }
+        return {name: breaker.get_metrics()
+                for name, breaker in cls._circuit_breakers.items()}
 
     @classmethod
     def reset_all(cls):
@@ -366,8 +340,7 @@ def circuit_breaker(
 
                 if circuit.is_open():
                     raise CircuitBreakerError(
-                        f"Circuit breaker '{name}' is open"
-                    )
+                        f"Circuit breaker '{name}' is open")
 
                 try:
                     result = await func(*args, **kwargs)
@@ -391,8 +364,7 @@ def circuit_breaker(
 
                 if circuit.is_open():
                     raise CircuitBreakerError(
-                        f"Circuit breaker '{name}' is open"
-                    )
+                        f"Circuit breaker '{name}' is open")
 
                 try:
                     result = func(*args, **kwargs)

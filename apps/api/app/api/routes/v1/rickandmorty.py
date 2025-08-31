@@ -29,13 +29,10 @@ router = APIRouter()
 async def get_characters_by_ids(
     characters_id: str,
     rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service
-    ),
+        get_rick_and_morty_service),
 ):
     try:
-        return await rick_and_morty_service.get_characters_by_ids(
-            characters_id
-        )
+        return await rick_and_morty_service.get_characters_by_ids(characters_id)
     except RickAndMortyAPIError as e:
         if e.status_code == 404:
             raise HTTPException(
@@ -49,24 +46,20 @@ async def get_characters_by_ids(
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Internal Server Error while fetching Rick and Morty characters"
-            ),
+            detail=("Internal Server Error while fetching Rick and Morty characters"),
         )
 
 
 @router.get(
     "/character",
-    response_model=RickAndMortyCharacterResponse
-    | List[RickAndMortyCharacterResponse],
+    response_model=RickAndMortyCharacterResponse | List[RickAndMortyCharacterResponse],
     status_code=status.HTTP_200_OK,
     summary="Get Rick and Morty Characters",
 )
 async def get_characters(
     request: RickAndMortyCharacterRequest = Depends(),
     rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service
-    ),
+        get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_characters(request)
@@ -83,24 +76,20 @@ async def get_characters(
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Internal Server Error while fetching Rick and Morty characters"
-            ),
+            detail=("Internal Server Error while fetching Rick and Morty characters"),
         )
 
 
 @router.get(
     "/location",
-    response_model=RickAndMortyLocationResponse
-    | List[RickAndMortyLocationResponse],
+    response_model=RickAndMortyLocationResponse | List[RickAndMortyLocationResponse],
     status_code=status.HTTP_200_OK,
     summary="Get Rick and Morty Locations",
 )
 async def get_locations(
     request: RickAndMortyLocationRequest = Depends(),
     rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service
-    ),
+        get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_locations(request)
@@ -117,24 +106,20 @@ async def get_locations(
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Internal Server Error while fetching Rick and Morty locations"
-            ),
+            detail=("Internal Server Error while fetching Rick and Morty locations"),
         )
 
 
 @router.get(
     "/episode",
-    response_model=RickAndMortyEpisodeResponse
-    | List[RickAndMortyEpisodeResponse],
+    response_model=RickAndMortyEpisodeResponse | List[RickAndMortyEpisodeResponse],
     status_code=status.HTTP_200_OK,
     summary="Get Rick and Morty Episodes",
 )
 async def get_episodes(
     request: RickAndMortyEpisodeRequest = Depends(),
     rick_and_morty_service: RickAndMortyService = Depends(
-        get_rick_and_morty_service
-    ),
+        get_rick_and_morty_service),
 ):
     try:
         return await rick_and_morty_service.get_episodes(request)
@@ -151,7 +136,5 @@ async def get_episodes(
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Internal Server Error while fetching Rick and Morty episodes"
-            ),
+            detail=("Internal Server Error while fetching Rick and Morty episodes"),
         )

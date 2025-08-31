@@ -29,9 +29,7 @@ class Settings(BaseSettings):
     API_STR: str = "/api"
     PROJECT_NAME: str = "Grab Some APIs"
     VERSION: str = "0.1.0"
-    DESCRIPTION: str = (
-        "A unified dashboard of free public APIs with interactive widgets"
-    )
+    DESCRIPTION: str = "A unified dashboard of free public APIs with interactive widgets"
 
     # Server Configuration
     DEBUG: bool = False
@@ -79,13 +77,8 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def assemble_redis_connection(self) -> "Settings":
         if self.REDIS_URL is None:
-            auth_part = (
-                f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
-            )
-            self.REDIS_URL = (
-                f"redis://{auth_part}{self.REDIS_HOST}:"
-                f"{self.REDIS_PORT}/{self.REDIS_DB}"
-            )
+            auth_part = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
+            self.REDIS_URL = f"redis://{auth_part}{self.REDIS_HOST}:" f"{self.REDIS_PORT}/{self.REDIS_DB}"
         return self
 
     # External APIs Configuration
@@ -93,9 +86,8 @@ class Settings(BaseSettings):
     API_TIMEOUT: int = 30  # seconds
 
     # NASA
-    NASA_API_KEY: str = (
-        "DEMO_KEY"  # Default demo key, should be overridden in production
-    )
+    # Default demo key, should be overridden in production
+    NASA_API_KEY: str = "DEMO_KEY"
     NASA_BASE_URL: str = "https://api.nasa.gov/"
 
     # Rick and Morty
@@ -111,18 +103,14 @@ class Settings(BaseSettings):
             print("🔧 Configuration Debug Info:")
             print(f"   API_ROOT path: {API_ROOT}")
             print(
-                f"   .env.local exists: {(API_ROOT / '.env.local').exists()}"
-            )
+                f"   .env.local exists: {(API_ROOT / '.env.local').exists()}")
             print(f"   .env exists: {(API_ROOT / '.env').exists()}")
             print(f"   DEBUG: {self.DEBUG} (type: {type(self.DEBUG)})")
             print(f"   HOST: {self.HOST}")
             print(f"   PORT: {self.PORT}")
             print(f"   RELOAD: {self.RELOAD}")
-            nasa_key_display = (
-                "***" + self.NASA_API_KEY[-4:]
-                if len(self.NASA_API_KEY) > 4
-                else "***"
-            )
+            nasa_key_display = "***" + \
+                self.NASA_API_KEY[-4:] if len(self.NASA_API_KEY) > 4 else "***"
             print(f"   NASA_API_KEY: {nasa_key_display}")
 
 
