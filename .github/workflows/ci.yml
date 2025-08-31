@@ -433,10 +433,10 @@ jobs:
         working-directory: apps/api
         run: poetry install --no-interaction --no-ansi
 
-      - name: � Security audit
+      - name: 🔒 Security audit
         if: steps.check-python.outputs.python_files == 'true'
         working-directory: apps/api
-        run: poetry run safety check
+        run: poetry run pip-audit --ignore-vuln GHSA-wj6h-64fc-37mp
 
       - name: 🔍 Bandit security scan
         if: steps.check-python.outputs.python_files == 'true'

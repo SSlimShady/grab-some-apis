@@ -1,6 +1,3 @@
-import stat
-from calendar import c
-from email.policy import HTTP
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -49,10 +46,12 @@ async def get_characters_by_ids(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Rick and Morty API error",
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error while fetching Rick and Morty characters",
+            detail=(
+                "Internal Server Error while fetching Rick and Morty characters"
+            ),
         )
 
 
@@ -81,10 +80,12 @@ async def get_characters(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Rick and Morty API error",
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error while fetching Rick and Morty characters",
+            detail=(
+                "Internal Server Error while fetching Rick and Morty characters"
+            ),
         )
 
 
@@ -113,10 +114,12 @@ async def get_locations(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Rick and Morty API error",
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error while fetching Rick and Morty locations",
+            detail=(
+                "Internal Server Error while fetching Rick and Morty locations"
+            ),
         )
 
 
@@ -145,8 +148,10 @@ async def get_episodes(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Rick and Morty API error",
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error while fetching Rick and Morty locations",
+            detail=(
+                "Internal Server Error while fetching Rick and Morty episodes"
+            ),
         )
