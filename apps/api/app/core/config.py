@@ -92,11 +92,14 @@ class Settings(BaseSettings):
     API_RATE_LIMIT: int = 100  # requests per minute
     API_TIMEOUT: int = 30  # seconds
 
-    # NASA API Configuration
+    # NASA
     NASA_API_KEY: str = (
         "DEMO_KEY"  # Default demo key, should be overridden in production
     )
-    NASA_BASE_URL: str = "https://api.nasa.gov"
+    NASA_BASE_URL: str = "https://api.nasa.gov/"
+
+    # Rick and Morty
+    RICK_AND_MORTY_BASE_URL: str = "https://rickandmortyapi.com/api/"
 
     # Logging
     LOG_LEVEL: str = "INFO"

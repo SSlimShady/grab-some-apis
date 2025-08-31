@@ -44,7 +44,7 @@ class NASAService(BaseAPIService):
 
     def __init__(self, api_key: Optional[str] = None):
         """Initialize NASA service."""
-        base_url = "https://api.nasa.gov/"
+        base_url = settings.NASA_BASE_URL
         super().__init__("NASA", base_url)
 
         # Use provided API key or fall back to settings
@@ -152,7 +152,7 @@ class NASAService(BaseAPIService):
             return {
                 "status": "healthy",
                 "service": "NASA API",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "api_key_valid": bool(response_data),
                 "rate_limit_remaining": "unknown",  # NASA doesn't provide this in response
             }
@@ -161,7 +161,7 @@ class NASAService(BaseAPIService):
             return {
                 "status": "unhealthy",
                 "service": "NASA API",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "error": f"API Error {e.status_code}: {e.message}",
                 "api_key_valid": e.status_code != 401,
             }

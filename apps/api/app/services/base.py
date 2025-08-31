@@ -193,6 +193,7 @@ class BaseAPIService(ABC):
         self,
         endpoint: str,
         params: Optional[Dict[str, Any]] = None,
+        path_params: Optional[Dict[str, Any]] = None,
         method: str = "GET",
         data: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
@@ -216,6 +217,13 @@ class BaseAPIService(ABC):
             APITimeoutError: Request timed out
         """
         # Prepare request
+        if path_params:
+            try:
+                endpoint = endpoint.format(**path_params)
+            except KeyError as e:
+                raise APIValidationError(
+                    f"Missing required path parameter: {e}", self.service_name
+                )
         url = urljoin(self.base_url + "/", endpoint.lstrip("/"))
         request_params = self._build_auth_params(params or {})
         request_headers = {**self._build_headers(), **(headers or {})}

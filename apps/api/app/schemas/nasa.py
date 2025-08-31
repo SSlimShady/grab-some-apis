@@ -1,7 +1,3 @@
-"""
-NASA API related Pydantic schemas for request/response validation.
-"""
-
 from datetime import date, datetime
 from typing import Optional
 
@@ -9,21 +5,17 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class APODResponse(BaseModel):
-    """Schema for APOD response from NASA API."""
-
     title: str
     date: str
     explanation: str
     media_type: str
-    url: Optional[str] = None
-    hdurl: Optional[str] = None
+    url: str | None = None
+    hdurl: str | None = None
     service_version: str
-    copyright: Optional[str] = None
+    copyright: str | None = None
 
 
 class APODRequest(BaseModel):
-    """Schema for requesting the Astronomy Picture of the Day (APOD)."""
-
     date: Optional[str] = Field(
         None,
         description="Date for APOD in YYYY-MM-DD format. Defaults to today.",
