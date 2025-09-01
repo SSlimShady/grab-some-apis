@@ -35,10 +35,13 @@ def main():
 
     print("Formatting Python code...")
 
-    # Run Black formatter
-    black_success = run_command(["poetry", "run", "black", "app/", "--line-length", "120"], "Black formatter")
+    # Run isort to sort imports first
+    isort_success = run_command(["poetry", "run", "isort", "."], "isort import sorter")
 
-    # Run autopep8 for additional fixes
+    # Run Black formatter on app and tests
+    black_success = run_command(["poetry", "run", "black", ".", "--line-length", "120"], "Black formatter")
+
+    # Run autopep8 for additional fixes on app and tests
     autopep8_success = run_command(
         [
             "poetry",
@@ -48,12 +51,12 @@ def main():
             "--aggressive",
             "--in-place",
             "--recursive",
-            "app/",
+            ".",
         ],
         "autopep8 formatter",
     )
 
-    if black_success and autopep8_success:
+    if isort_success and black_success and autopep8_success:
         print("Code formatting completed successfully!")
     else:
         print("Some formatting tools failed. Check the output above.")

@@ -3,8 +3,9 @@ Basic tests for the FastAPI application.
 """
 
 import pytest
-from app.main import app
 from fastapi.testclient import TestClient
+
+from app.main import app
 
 # Sync test client
 client = TestClient(app)
