@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.youtube.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'rickandmortyapi.com',
+      },
     ],
     // Add GIF support and other formats
     formats: ['image/webp', 'image/avif'],

@@ -27,6 +27,11 @@ export enum ImageSize {
 // NASA API endpoints enum
 export enum NASAEndpoint {
   APOD = '/apod',
-  MARS_PHOTOS = '/mars-photos/api/v1/rovers',
-  NEO_WS = '/neo/rest/v1/feed',
+}
+
+// Rick and Morty API endpoints enum
+export enum RickAndMortyEndpoint {
+  CHARACTERS = 'rickandmorty/character',
+  LOCATIONS = 'rickandmorty/location',
+  EPISODES = 'rickandmorty/episode',
 }

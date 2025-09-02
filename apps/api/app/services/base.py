@@ -179,6 +179,19 @@ class BaseAPIService(ABC):
             params["api_key"] = self.api_key
         return params
 
+    def _serialize_params(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Serialize parameters for HTTP requests.
+        Converts enum values to their string representation.
+        """
+        serialized = {}
+        for key, value in params.items():
+            if hasattr(value, "value"):  # This is an enum
+                serialized[key] = value.value
+            else:
+                serialized[key] = value
+        return serialized
+
     def _build_headers(self) -> Dict[str, str]:
         """
         Build request headers.
@@ -221,7 +234,8 @@ class BaseAPIService(ABC):
             except KeyError as e:
                 raise APIValidationError(f"Missing required path parameter: {e}", self.service_name)
         url = urljoin(self.base_url + "/", endpoint.lstrip("/"))
-        request_params = self._build_auth_params(params or {})
+        serialized_params = self._serialize_params(params or {})
+        request_params = self._build_auth_params(serialized_params)
         request_headers = {**self._build_headers(), **(headers or {})}
 
         client = await self._get_client()

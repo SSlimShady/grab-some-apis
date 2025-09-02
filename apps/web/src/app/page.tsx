@@ -29,6 +29,13 @@ export default function Home() {
             Explore GIPHY
           </a>
           <a
+            className='bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent px-4 text-sm font-medium transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]'
+            href='/rickandmorty'
+            rel='noopener noreferrer'
+          >
+            Explore Rick and Morty
+          </a>
+          <a
             className='flex h-10 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-4 text-sm font-medium transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:w-auto sm:px-5 sm:text-base md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]'
             href='https://github.com/SSlimShady/grab-some-apis/blob/main/README.md'
             target='_blank'

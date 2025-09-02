@@ -8,7 +8,7 @@ interface AppConfig {
     readonly formats: readonly string[]
     readonly maxSize: number
   }
-  readonly nasa: {
+  readonly api: {
     readonly timeout: number
     readonly retries: number
   }
@@ -25,7 +25,7 @@ export const CONFIG: AppConfig = {
     formats: ['webp', 'avif', 'jpeg', 'png', 'gif'] as const,
     maxSize: 5 * 1024 * 1024, // 5MB
   },
-  nasa: {
+  api: {
     timeout: 10000, // 10 seconds
     retries: 3,
   },
@@ -38,7 +38,7 @@ export const CONFIG: AppConfig = {
 // Type helper to ensure config keys exist
 export type ConfigKey = keyof typeof CONFIG
 export type ImageConfig = typeof CONFIG.images
-export type NASAConfig = typeof CONFIG.nasa
+export type APIConfig = typeof CONFIG.api
 
 // Runtime validation function
 export function validateConfig(): void {
@@ -46,7 +46,7 @@ export function validateConfig(): void {
     throw new Error('Image fallback must be an absolute path')
   }
 
-  if (CONFIG.nasa.timeout <= 0) {
-    throw new Error('NASA timeout must be positive')
+  if (CONFIG.api.timeout <= 0) {
+    throw new Error('API timeout must be positive')
   }
 }

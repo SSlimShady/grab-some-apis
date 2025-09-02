@@ -58,10 +58,7 @@ export async function fetchAPOD(
       headers: {
         'Content-Type': 'application/json',
       },
-      // Add cache control for better performance
-      next: { revalidate: 3600 }, // Cache for 1 hour
-      // Use config for timeout
-      signal: AbortSignal.timeout(CONFIG.nasa.timeout),
+      signal: AbortSignal.timeout(CONFIG.api.timeout),
     })
 
     if (!response.ok) {

@@ -11,7 +11,7 @@ export const ENV = {
   APOD_BASE_URL:
     process.env.NEXT_PUBLIC_APOD_BASE_URL || 'https://apod.nasa.gov/apod',
   BACKEND_API_BASE_URL:
-    process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL || 'http://localhost:8000',
+    process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL || 'http://localhost:8000/api',
   NODE_ENV: process.env.NODE_ENV || 'development',
   IS_PRODUCTION: process.env.NODE_ENV === 'production',
   IS_DEVELOPMENT: process.env.NODE_ENV === 'development',
